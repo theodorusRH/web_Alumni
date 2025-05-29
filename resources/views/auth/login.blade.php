@@ -1,34 +1,39 @@
-@extends('layouts.auth')
+@extends('layouts.app')
 
 @section('content')
-<div class="login-box text-center">
-    @if ($errors->any())
-        <div class="alert alert-danger text-start">
-            @foreach ($errors->all() as $error)
-                <div>{{ $error }}</div>
-            @endforeach
-        </div>
-    @endif
+<div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
+        <h3 class="mb-4 text-center">Sign In</h3>
 
-    <h4 class="mb-4">Login</h4>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
-        <label for="username">Username</label>
-        <input id="username" type="text" name="username" class="form-control" required>
+        <form method="POST" action="{{ route('login') }}">
+            @csrf
 
-        <br>
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input id="username" type="text" name="username" class="form-control" required autofocus>
+            </div>
 
-        <label for="password">Password</label>
-        <input id="password" type="password" name="password" class="form-control" required>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input id="password" type="password" name="password" class="form-control" required>
+            </div>
 
-        <br>
+            <button type="submit" class="btn btn-primary w-100">Sign In</button>
+        </form>
 
-        <button type="submit" class="btn btn-success btn-block w-100">Login</button>
-
-        <br>
-        
-        <a href="{{ route('register') }}" class="btn btn-link">Don't have an account? Sign up</a>
-    </form>
+        <p class="mt-3 text-center">
+            Don't have an account? <a href="{{ route('register.form') }}">Sign Up</a>
+        </p>
+    </div>
 </div>
 @endsection
