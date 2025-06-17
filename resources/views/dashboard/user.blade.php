@@ -14,9 +14,9 @@
                 <div class="card-body">
                     <h5 class="card-title">User Info</h5>
                     <p class="card-text">
-                        Name: {{ Auth::user()->name }}<br>
+                        {{-- Name: {{ Auth::user()->name }}<br>
                         Email: {{ Auth::user()->email }}<br>
-                        Phone: {{ Auth::user()->phone }}<br>
+                        Phone: {{ Auth::user()->phone }}<br> --}}
                     </p>
                 </div>
             </div>

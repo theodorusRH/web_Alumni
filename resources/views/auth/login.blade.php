@@ -19,8 +19,8 @@
             @csrf
 
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input id="username" type="text" name="username" class="form-control" required autofocus>
+                <label for="id" class="form-label">ID</label>
+                <input id="id" type="text" name="id" class="form-control" required autofocus>
             </div>
 
             <div class="mb-3">

@@ -20,21 +20,21 @@ class LoginController extends Controller
     {
         // Validasi inputan
         $request->validate([
-            'username' => 'required',
+            'id' => 'required',
             'password' => 'required',
         ]);
 
-        // Mencari user berdasarkan username
-        $user = User::where('username', $request->username)->first();
+        // Mencari user berdasarkan id
+        $user = User::where('id', $request->id)->first();
 
-        // Cek apakah username ditemukan
+        // Cek apakah id ditemukan
         if (!$user) {
-            return back()->withErrors(['username' => 'Username tidak ditemukan']);
+            return back()->withErrors(['id' => 'id tidak ditemukan']);
         }
 
         // Cek apakah akun aktif
         if ($user->status_active != 1) {
-            return back()->withErrors(['username' => 'Akun Anda tidak aktif']);
+            return back()->withErrors(['id' => 'Akun Anda tidak aktif']);
         }
 
         // Cek password

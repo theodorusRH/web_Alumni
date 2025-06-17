@@ -4,7 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Web Alumni</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .navbar-nav {
             flex: 1;
@@ -91,34 +93,45 @@
                 <li class="nav-item mx-2">
                     <a class="nav-link" href="{{ route('kegiatan.index') }}">Kegiatan Alumni</a>
                 </li>
-                <li class="nav-item mx-2 dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Data
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ route('admin.mahasiswa.index') }}">Mahasiswa</a></li>
-                        <li><a class="dropdown-item" href="{{ route('admin.pekerjaan.index') }}">Pekerjaan</a></li>
-                        <li><a class="dropdown-item" href="{{ route('admin.pendidikan.index') }}">Pendidikan</a></li>
-                        <li>
-                            <a class="dropdown-item" href="
-                                @auth
-                                    @if(Auth::user()->isAdmin())
-                                        {{ route('admin.lowongan.index') }}
-                                    @else
-                                        {{ route('lowongan.index') }}
-                                    @endif
-                                @else
-                                    {{ route('lowongan.index') }}
-                                @endauth
-                            ">
-                                Lowongan
+                @auth
+                    @if(Auth::user()->roles->name === 'admin')
+                        <li class="nav-item mx-2 dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Data
                             </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ route('admin.mahasiswa.index') }}">Mahasiswa</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.pekerjaan.index') }}">Pekerjaan</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.pendidikan.index') }}">Pendidikan</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.lowongan.index') }}">Lowongan</a></li>
+                            </ul>
                         </li>
-                    </ul>
-                </li>
+                    @elseif(Auth::user()->roles->name === 'dosen')
+                        <li class="nav-item mx-2 dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Dosen
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ route('dosen.tugasakhir') }}">Bimbingan TA</a></li>
+                                {{-- Tambah menu dosen lain di sini --}}
+                            </ul>
+                        </li>
+                    @elseif(Auth::user()->roles->name === 'alumni')
+                        <li class="nav-item mx-2">
+                            <a class="nav-link" href="{{ route('lowongan.index') }}">Lowongan</a>
+                        </li>
+                    @endif
+                @endauth
                 <li class="nav-item mx-2">
                     <a class="nav-link" href="{{ url('/kontak') }}">Kontak</a>
                 </li>
+                @auth
+                    @if(Auth::user()->roles && Auth::user()->roles->name === 'admin')
+                        <li class="nav-item mx-2">
+                            <a class="nav-link" href="{{ url('/pertanyaan') }}">Pertanyaan</a>
+                        </li>
+                    @endif
+                @endauth
             </ul>
 
             <ul class="navbar-nav auth-buttons">
@@ -130,14 +143,22 @@
                         <a class="btn px-3 {{ Request::is('register') ? 'btn-success btn-outline-success' : 'btn-outline-primary' }}" href="{{ route('register.form') }}" role="button">Sign Up</a>
                     </li>
                 @else
-                    <li class="nav-item mx-2">
-                        <span class="nav-link">Welcome, {{ Auth::user()->username }}</span>
-                    </li>
-                    <li class="nav-item mx-2">
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-link nav-link p-0">Logout</button>
-                        </form>
+                    <li class="nav-item dropdown mx-2">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Welcome, {{ Auth::user()->username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('profile') }}">Profile</a>
+                            </li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" class="dropdown-item p-0 m-0">
+                                    @csrf
+                                    <button type="submit" class="btn btn-link dropdown-item w-100 text-start">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
                     </li>
                 @endguest
             </ul>
@@ -151,5 +172,23 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggle = document.getElementById('togglePassword');
+        const input = document.getElementById('passwordInput');
+        const icon = document.getElementById('toggleIcon');
+
+        if (toggle && input && icon) {
+            toggle.addEventListener('click', function () {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                icon.classList.toggle('bi-eye');
+                icon.classList.toggle('bi-eye-slash');
+            });
+        }
+    });
+</script>
+{{-- @stack('scripts') --}}
 </body>
 </html>

@@ -31,14 +31,14 @@ class RegisterController extends Controller
             'roles_id'    => 'required'
         ]);
 
-        $employee = new Employee();
-        $employee->name          = $request->name;
-        $employee->phone_number  = $request->phone;
-        $employee->email         = $request->email;
-        $employee->address       = $request->address;
-        $employee->gender        = $request->gender;
-        $employee->status_active = 1;
-        $employee->save();
+        // $employee = new Employee();
+        // $employee->name          = $request->name;
+        // $employee->phone_number  = $request->phone;
+        // $employee->email         = $request->email;
+        // $employee->address       = $request->address;
+        // $employee->gender        = $request->gender;
+        // $employee->status_active = 1;
+        // $employee->save();
 
         $user = new User();
         $user->username      = $request->username;

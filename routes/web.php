@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\EmployeeController;
+// use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\PublicController;
@@ -14,6 +14,9 @@ use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PendidikanController;
 use App\Http\Controllers\PekerjaanController;
 use App\Http\Controllers\LowonganController;
+use App\Http\Controllers\KontakController;
+use App\Http\Controllers\PertanyaanController;
+use App\Http\Controllers\DosenController;
 
 // Halaman utama
 Route::get('/', function () {
@@ -32,7 +35,15 @@ Route::get('/kegiatan/{id}', [KegiatanController::class, 'show'])->name('kegiata
 Route::get('/alumninews', [AlumniNewsController::class, 'index'])->name('alumninews.index');
 Route::get('/alumninews/{id}', [AlumniNewsController::class, 'show'])->name('alumninews.show');
 Route::get('/lowongan', [LowonganController::class, 'publicIndex'])->name('lowongan.index');
-Route::get('/kontak', [PublicController::class, 'kontak'])->name('kontak');
+
+// KONTAK
+Route::get('/kontak', [KontakController::class, 'index'])->name('kontak.index');
+Route::post('/kontak', [KontakController::class, 'store'])->name('kontak.kirim');
+
+//PERTANYAAN
+
+
+Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
 // Authentication
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -43,9 +54,16 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 
 // Dashboard (authenticated users)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/dashboard', [EmployeeController::class, 'index'])->name('dashboard.index');
+    Route::get('/admin/dashboard', [UserController::class, 'index'])->name('dashboard.index');
     Route::get('/user/dashboard', [UserController::class, 'index'])->name('dashboard.user');
+
+    //PROFILE
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 });
+
+//DOSEN
+Route::middleware(['auth'])->get('/dosen/tugasakhir', [DosenController::class, 'index'])->name('dosen.tugasakhir');
 
 // Admin-only routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -88,6 +106,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/laporan', [AlumniController::class, 'laporan'])->name('laporan');
     Route::get('/laporan/export', [AlumniController::class, 'exportLaporan'])->name('laporan.export');
+
+    Route::get('/pertanyaan', [PertanyaanController::class, 'index'])->name('pertanyaan.index');
+    Route::delete('/pertanyaan/{idpertanyaan}', [PertanyaanController::class, 'destroy'])->name('pertanyaan.destroy');
 
     // 👇 Tambahan manajemen kegiatan
     Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');

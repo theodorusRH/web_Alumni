@@ -34,6 +34,10 @@ class Mahasiswa extends Model
         'iscomplete'
     ];
 
+    protected $casts = [
+        'tgllahir' => 'date',
+    ];
+
     protected $dates = [
         'tgllahir'
     ];
@@ -51,6 +55,16 @@ class Mahasiswa extends Model
     public function pekerjaan()
     {
         return $this->hasMany(Pekerjaan::class, 'nrp', 'nrp');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'nrp', 'id');
+    }
+
+    public function tugasAkhir()
+    {
+        return $this->hasOne(TugasAkhir::class, 'nrp', 'nrp');
     }
 
     // Check if student is alumni (has graduation data)
