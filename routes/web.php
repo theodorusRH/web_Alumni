@@ -75,12 +75,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/alumni', [AlumniController::class, 'alumni'])->name('alumni');
 
-    Route::get('/pendidikan/{nrp?}', [PendidikanController::class, 'index'])->name('pendidikan.index');
-    Route::post('/pendidikan', [PendidikanController::class, 'storePendidikan'])->name('pendidikan.store');
-    Route::put('/pendidikan/{id}', [PendidikanController::class, 'updatePendidikan'])->name('pendidikan.update');
-    Route::delete('/pendidikan/{id}', [PendidikanController::class, 'destroyPendidikan'])->name('pendidikan.destroy');
+    Route::get('/pendidikan', [PendidikanController::class, 'index'])->name('pendidikan.index');
+    Route::get('/pendidikan/{nrp}', [PendidikanController::class, 'index'])->name('pendidikan.show');
+    Route::post('/pendidikan/{nrp}', [PendidikanController::class, 'store'])->name('pendidikan.store');
+    Route::put('/pendidikan/{id}', [PendidikanController::class, 'update'])->name('pendidikan.update');
+    Route::delete('/pendidikan/{id}', [PendidikanController::class, 'destroy'])->name('pendidikan.destroy');
 
-    Route::get('/pekerjaan/{nrp?}', [PekerjaanController::class, 'index'])->name('pekerjaan.index');
+    // Route::get('/pekerjaan', [PekerjaanController::class, 'index'])->name('pekerjaan.index');
+    Route::get('/pekerjaan', [PekerjaanController::class, 'index'])->name('pekerjaan.index');
+    Route::get('/pekerjaan/{nrp}', [PekerjaanController::class, 'index'])->name('pekerjaan.show');
     Route::post('/pekerjaan', [PekerjaanController::class, 'storePekerjaan'])->name('pekerjaan.store');
     Route::put('/pekerjaan/{id}', [PekerjaanController::class, 'updatePekerjaan'])->name('pekerjaan.update');
     Route::delete('/pekerjaan/{id}', [PekerjaanController::class, 'destroyPekerjaan'])->name('pekerjaan.destroy');

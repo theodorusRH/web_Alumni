@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Pekerjaan;
@@ -8,25 +7,24 @@ use Illuminate\Http\Request;
 
 class PekerjaanController extends Controller
 {
-    public function index($nrp)
+    public function index($nrp = null)
     {
+        if (!$nrp) {
+            $mahasiswas = Mahasiswa::all();
+            return view('pekerjaan.select_mahasiswa', compact('mahasiswas'));
+        }
+
         $mahasiswa = Mahasiswa::findOrFail($nrp);
         $pekerjaans = $mahasiswa->pekerjaan()->with('jenisPekerjaan')->get();
 
         return view('pekerjaan.index', compact('mahasiswa', 'pekerjaans'));
     }
 
-    public function create($nrp)
-    {
-        $mahasiswa = Mahasiswa::findOrFail($nrp);
-        $propinsis = \App\Models\Propinsi::all();
 
-        return view('pekerjaan.create', compact('mahasiswa', 'propinsis'));
-    }
-
-    public function store(Request $request, $nrp)
+    public function storePekerjaan(Request $request)
     {
         $request->validate([
+            'nrp' => 'required|exists:mahasiswa,nrp',
             'idjenispekerjaan' => 'required|exists:jenis_pekerjaan,idjenispekerjaan',
             'bidangusaha' => 'required|string|max:255',
             'perusahaan' => 'nullable|string|max:255',
@@ -40,34 +38,16 @@ class PekerjaanController extends Controller
             'jabatan' => 'nullable|string|max:100',
         ]);
 
-        $data = $request->all();
-        $data['nrp'] = $nrp;
+        Pekerjaan::create($request->all());
 
-        Pekerjaan::create($data);
-
-        return redirect()->route('pekerjaan.index', $nrp)
+        return redirect()->route('admin.pekerjaan.index', $request->nrp)
             ->with('success', 'Data pekerjaan berhasil ditambahkan');
     }
 
-    public function show($id)
-    {
-        $pekerjaan = Pekerjaan::with('jenisPekerjaan', 'mahasiswa', 'propinsi')->findOrFail($id);
-
-        return view('pekerjaan.show', compact('pekerjaan'));
-    }
-
-    public function edit($id)
+    public function updatePekerjaan(Request $request, $id)
     {
         $pekerjaan = Pekerjaan::findOrFail($id);
-        $propinsis = \App\Models\Propinsi::all();
-
-        return view('pekerjaan.edit', compact('pekerjaan', 'propinsis'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $pekerjaan = Pekerjaan::findOrFail($id);
-
+        
         $request->validate([
             'idjenispekerjaan' => 'required|exists:jenis_pekerjaan,idjenispekerjaan',
             'bidangusaha' => 'required|string|max:255',
@@ -84,15 +64,17 @@ class PekerjaanController extends Controller
 
         $pekerjaan->update($request->all());
 
-        return redirect()->route('pekerjaan.show', $id)
+        return redirect()->route('admin.pekerjaan.index', $pekerjaan->nrp)
             ->with('success', 'Data pekerjaan berhasil diupdate');
     }
 
-    public function destroy($id)
+    public function destroyPekerjaan($id)
     {
         $pekerjaan = Pekerjaan::findOrFail($id);
+        $nrp = $pekerjaan->nrp;
         $pekerjaan->delete();
 
-        return redirect()->back()->with('success', 'Data pekerjaan berhasil dihapus');
+        return redirect()->route('admin.pekerjaan.index', $nrp)
+            ->with('success', 'Data pekerjaan berhasil dihapus');
     }
 }

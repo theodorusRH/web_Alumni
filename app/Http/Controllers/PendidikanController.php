@@ -9,13 +9,19 @@ use Illuminate\Http\Request;
 class PendidikanController extends Controller
 {
     // Tampilkan daftar pendidikan milik mahasiswa tertentu
-    public function index($nrp)
+    public function index($nrp = null)
     {
+        if (!$nrp) {
+            $mahasiswas = Mahasiswa::all();
+            return view('pendidikan.select_mahasiswa', compact('mahasiswas'));
+        }
+
         $mahasiswa = Mahasiswa::findOrFail($nrp);
         $pendidikans = $mahasiswa->pendidikan()->with('jurusan')->get();
 
         return view('pendidikan.index', compact('mahasiswa', 'pendidikans'));
     }
+
 
     // Tampilkan form buat tambah pendidikan baru
     public function create($nrp)

@@ -11,7 +11,7 @@
             <label for="idjenispekerjaan" class="form-label">Jenis Pekerjaan</label>
             <select name="idjenispekerjaan" id="idjenispekerjaan" class="form-control" required>
                 <option value="">-- Pilih Jenis Pekerjaan --</option>
-                @foreach(\App\Models\JenisPekerjaan::all() as $jenis)
+                @foreach(JenisPekerjaan::all() as $jenis)
                 <option value="{{ $jenis->idjenispekerjaan }}" {{ old('idjenispekerjaan') == $jenis->idjenispekerjaan ? 'selected' : '' }}>
                     {{ $jenis->nama }}
                 </option>
