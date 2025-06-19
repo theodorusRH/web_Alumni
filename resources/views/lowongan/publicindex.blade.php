@@ -3,12 +3,10 @@
 @section('content')
 <div class="container">
     <h2 class="mb-4 text-center">Lowongan Kerja</h2>
-
     <div class="row row-cols-1 row-cols-md-2 g-4">
         @forelse ($lowongans as $l)
             <div class="col">
                 <div class="card h-100 p-3">
-
                     <a href="{{ route('lowongan.index', $l->idlowongan) }}" style="text-decoration: none; color: inherit;">
                         <h5 class="card-title">{{ $l->jabatan }}</h5>
                         <p class="card-text">
@@ -28,7 +26,6 @@
                         </p>
                         <p><strong>Gaji:</strong> {{ $l->gajimin }} - {{ $l->gajimax }}</p>
                     </a>
-
                 </div>
             </div>
         @empty

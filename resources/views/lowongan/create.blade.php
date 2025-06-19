@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.lowongan.store') }}" method="POST">
+    <form action="{{ route('lowongan.store') }}" method="POST">
         @csrf
 
         <h4>Data Lowongan</h4>
@@ -56,7 +56,6 @@
             </div>
         </div>
 
-        <!-- Field Kirim (tersembunyi) -->
         <input type="hidden" name="kirim" id="kirim" value="offline">
 
         <h4>Data Perusahaan</h4>
@@ -72,7 +71,6 @@
             <label for="kota" class="form-label">Kota</label>
             <input type="text" class="form-control" name="perusahaan[kota]" required>
         </div>
-        <!-- TAMBAHAN: Field Propinsi -->
         <div class="mb-3">
             <label for="idpropinsi" class="form-label">Propinsi</label>
             <select class="form-control" name="perusahaan[idpropinsi]" required>
@@ -97,28 +95,32 @@
         </div>
 
         <button type="submit" class="btn btn-success">Simpan</button>
-        <a href="{{ route('admin.lowongan.index') }}" class="btn btn-secondary">Kembali</a>
+
     </form>
+    @auth
+        @if(Auth::user()->roles->name === 'alumni')
+            <div class="text-center mb-4">
+                <a href="{{ route('lowongan.mine') }}" class="btn btn-secondary">Kembali</a>
+            </div>
+        @elseif(Auth::user()->roles->name === 'admin')
+            <div class="text-center mb-4">
+                <a href="{{ route('lowongan.index') }}" class="btn btn-secondary">Kembali</a>
+            </div>
+        @endif
+    @endauth
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const emailInput = document.getElementById('perusahaan_email');
     const kirimInput = document.getElementById('kirim');
-    
+
     function updateKirim() {
-        if (emailInput.value.trim() !== '') {
-            kirimInput.value = 'email';
-        } else {
-            kirimInput.value = 'offline';
-        }
+        kirimInput.value = emailInput.value.trim() !== '' ? 'email' : 'offline';
     }
-    
-    // Update saat user mengetik di field email
+
     emailInput.addEventListener('input', updateKirim);
     emailInput.addEventListener('blur', updateKirim);
-    
-    // Set nilai awal
     updateKirim();
 });
 </script>

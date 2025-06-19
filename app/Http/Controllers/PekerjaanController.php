@@ -1,12 +1,16 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Pekerjaan;
 use App\Models\Mahasiswa;
+use App\Models\JenisPekerjaan;
+use App\Models\Propinsi;
 use Illuminate\Http\Request;
 
 class PekerjaanController extends Controller
 {
+    // Menampilkan daftar pekerjaan berdasarkan NRP mahasiswa
     public function index($nrp = null)
     {
         if (!$nrp) {
@@ -20,12 +24,21 @@ class PekerjaanController extends Controller
         return view('pekerjaan.index', compact('mahasiswa', 'pekerjaans'));
     }
 
+    // Form untuk tambah pekerjaan
+    public function create($nrp)
+    {
+        $mahasiswa = Mahasiswa::findOrFail($nrp);
+        $jenisPekerjaans = JenisPekerjaan::all();
+        $propinsis = Propinsi::all();
 
-    public function storePekerjaan(Request $request)
+        return view('pekerjaan.create', compact('mahasiswa', 'jenisPekerjaans', 'propinsis'));
+    }
+
+    // Simpan pekerjaan baru
+    public function store(Request $request, $nrp)
     {
         $request->validate([
-            'nrp' => 'required|exists:mahasiswa,nrp',
-            'idjenispekerjaan' => 'required|exists:jenis_pekerjaan,idjenispekerjaan',
+            'idjenispekerjaan' => 'required|exists:jenispekerjaan,idjenispekerjaan',
             'bidangusaha' => 'required|string|max:255',
             'perusahaan' => 'nullable|string|max:255',
             'telepon' => 'nullable|string|max:50',
@@ -34,22 +47,44 @@ class PekerjaanController extends Controller
             'alamat' => 'nullable|string|max:255',
             'kota' => 'nullable|string|max:100',
             'kodepos' => 'nullable|string|max:10',
-            'idpropinsi' => 'nullable|exists:propinsi,idpropinsi',
+            'idpropinsi' => 'required|exists:propinsi,idpropinsi',
             'jabatan' => 'nullable|string|max:100',
         ]);
 
-        Pekerjaan::create($request->all());
+        $idjenispekerjaan = $request->idjenispekerjaan;
+        $idpropinsi = $request->idpropinsi;
 
-        return redirect()->route('admin.pekerjaan.index', $request->nrp)
-            ->with('success', 'Data pekerjaan berhasil ditambahkan');
+        // Cek duplikat berdasarkan composite key
+        $existing = Pekerjaan::where('nrp', $nrp)
+            ->where('idjenispekerjaan', $idjenispekerjaan)
+            ->where('idpropinsi', $idpropinsi)
+            ->first();
+
+        if ($existing) {
+            return redirect()->route('admin.pekerjaan.show', $nrp)
+                ->with('error', 'Data pekerjaan dengan kombinasi yang sama sudah ada.');
+        }
+
+        $data = $request->all();
+        $data['nrp'] = $nrp;
+
+        Pekerjaan::create($data);
+
+        return redirect()->route('admin.pekerjaan.show', $nrp)
+            ->with('success', 'Data pekerjaan berhasil ditambahkan.');
     }
 
-    public function updatePekerjaan(Request $request, $id)
+
+    // Update pekerjaan yang ada
+    public function updatePekerjaan(Request $request, $nrp, $idjenispekerjaan, $idpropinsi)
     {
-        $pekerjaan = Pekerjaan::findOrFail($id);
-        
+        $pekerjaan = Pekerjaan::where('nrp', $nrp)
+            ->where('idjenispekerjaan', $idjenispekerjaan)
+            ->where('idpropinsi', $idpropinsi)
+            ->firstOrFail();
+
         $request->validate([
-            'idjenispekerjaan' => 'required|exists:jenis_pekerjaan,idjenispekerjaan',
+            'idjenispekerjaan' => 'required|exists:jenispekerjaan,idjenispekerjaan',
             'bidangusaha' => 'required|string|max:255',
             'perusahaan' => 'nullable|string|max:255',
             'telepon' => 'nullable|string|max:50',
@@ -64,17 +99,21 @@ class PekerjaanController extends Controller
 
         $pekerjaan->update($request->all());
 
-        return redirect()->route('admin.pekerjaan.index', $pekerjaan->nrp)
-            ->with('success', 'Data pekerjaan berhasil diupdate');
+        return redirect()->route('admin.pekerjaan.show', $pekerjaan->nrp)
+            ->with('success', 'Data pekerjaan berhasil diperbarui.');
     }
 
-    public function destroyPekerjaan($id)
+    // Hapus pekerjaan
+    public function destroyPekerjaan($nrp, $idjenispekerjaan, $idpropinsi)
     {
-        $pekerjaan = Pekerjaan::findOrFail($id);
+        $pekerjaan = Pekerjaan::where('nrp', $nrp)
+            ->where('idjenispekerjaan', $idjenispekerjaan)
+            ->where('idpropinsi', $idpropinsi)
+            ->firstOrFail();
         $nrp = $pekerjaan->nrp;
         $pekerjaan->delete();
 
-        return redirect()->route('admin.pekerjaan.index', $nrp)
-            ->with('success', 'Data pekerjaan berhasil dihapus');
+        return redirect()->route('admin.pekerjaan.show', $nrp)
+            ->with('success', 'Data pekerjaan berhasil dihapus.');
     }
 }

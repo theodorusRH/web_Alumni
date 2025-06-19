@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
-// use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\PublicController;
@@ -40,9 +39,6 @@ Route::get('/lowongan', [LowonganController::class, 'publicIndex'])->name('lowon
 Route::get('/kontak', [KontakController::class, 'index'])->name('kontak.index');
 Route::post('/kontak', [KontakController::class, 'store'])->name('kontak.kirim');
 
-//PERTANYAAN
-
-
 Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
 // Authentication
@@ -60,6 +56,18 @@ Route::middleware(['auth'])->group(function () {
     //PROFILE
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
+    
+    Route::post('/profile/getPendidikanEditForm', [UserController::class, 'getPendidikanEditForm'])->name('profile.getPendidikanEditForm');
+    Route::put('/profile/pendidikan/{nrp}/{idjurusan}', [UserController::class, 'updatePendidikan'])->name('profile.updatePendidikan');
+
+    Route::post('/profile/getPekerjaanEditForm', [UserController::class, 'getPekerjaanEditForm'])->name('profile.getPekerjaanEditForm');
+    Route::put('/profile/pekerjaan/{nrp}/{idjenispekerjaan}', [UserController::class, 'updatePekerjaan'])->name('profile.updatePekerjaan');
+
+    Route::get('/lowongan/{id}/edit', [LowonganController::class, 'edit'])->name('lowongan.edit');
+    Route::get('/lowongan/create', [LowonganController::class, 'create'])->name('lowongan.create');
+    Route::post('/lowongan', [LowonganController::class, 'storeLowongan'])->name('lowongan.store');
+    Route::get('/lowongan/saya', [LowonganController::class, 'mine'])->name('lowongan.mine');
+
 });
 
 //DOSEN
@@ -77,29 +85,34 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/pendidikan', [PendidikanController::class, 'index'])->name('pendidikan.index');
     Route::get('/pendidikan/{nrp}', [PendidikanController::class, 'index'])->name('pendidikan.show');
+    Route::get('/pendidikan/create/{nrp}', [PendidikanController::class, 'create'])->name('pendidikan.create');
     Route::post('/pendidikan/{nrp}', [PendidikanController::class, 'store'])->name('pendidikan.store');
     Route::put('/pendidikan/{id}', [PendidikanController::class, 'update'])->name('pendidikan.update');
     Route::delete('/pendidikan/{id}', [PendidikanController::class, 'destroy'])->name('pendidikan.destroy');
 
     // Route::get('/pekerjaan', [PekerjaanController::class, 'index'])->name('pekerjaan.index');
+
     Route::get('/pekerjaan', [PekerjaanController::class, 'index'])->name('pekerjaan.index');
     Route::get('/pekerjaan/{nrp}', [PekerjaanController::class, 'index'])->name('pekerjaan.show');
-    Route::post('/pekerjaan', [PekerjaanController::class, 'storePekerjaan'])->name('pekerjaan.store');
-    Route::put('/pekerjaan/{id}', [PekerjaanController::class, 'updatePekerjaan'])->name('pekerjaan.update');
-    Route::delete('/pekerjaan/{id}', [PekerjaanController::class, 'destroyPekerjaan'])->name('pekerjaan.destroy');
+    Route::get('/pekerjaan/create/{nrp}', [PekerjaanController::class, 'create'])->name('pekerjaan.create');
+    Route::post('/pekerjaan/{nrp}', [PekerjaanController::class, 'store'])->name('pekerjaan.store');
+    Route::put('/pekerjaan/{nrp}/{idjenispekerjaan}/{idpropinsi}', [PekerjaanController::class, 'updatePekerjaan'])->name('pekerjaan.update');
+    Route::delete('/pekerjaan/{nrp}/{idjenispekerjaan}/{idpropinsi}', [PekerjaanController::class, 'destroyPekerjaan'])->name('pekerjaan.destroy');
 
+    
     Route::get('/perusahaan', [AlumniController::class, 'perusahaan'])->name('perusahaan');
     Route::post('/perusahaan', [AlumniController::class, 'storePerusahaan'])->name('perusahaan.store');
     Route::put('/perusahaan/{id}', [AlumniController::class, 'updatePerusahaan'])->name('perusahaan.update');
     Route::delete('/perusahaan/{id}', [AlumniController::class, 'destroyPerusahaan'])->name('perusahaan.destroy');
 
     Route::get('/lowongan', [LowonganController::class, 'index'])->name('lowongan.index');
+    Route::get('/lowongan/{id}/edit', [LowonganController::class, 'edit'])->name('lowongan.edit');
     Route::get('/lowongan/create', [LowonganController::class, 'create'])->name('lowongan.create');
     Route::post('/lowongan', [LowonganController::class, 'storeLowongan'])->name('lowongan.store');
-    Route::get('/lowongan/{id}/edit', [LowonganController::class, 'edit'])->name('lowongan.edit');
     Route::put('/lowongan/{id}', [LowonganController::class, 'updateLowongan'])->name('lowongan.update');
     Route::delete('/lowongan/{id}', [LowonganController::class, 'destroyLowongan'])->name('lowongan.destroy');
-
+    Route::post('/lowongan/{id}/approve', [LowonganController::class, 'approve'])->name('lowongan.approve');
+    
     Route::get('/propinsi', [AlumniController::class, 'propinsi'])->name('propinsi');
     Route::post('/propinsi', [AlumniController::class, 'storePropinsi'])->name('propinsi.store');
     Route::get('/jurusan', [AlumniController::class, 'jurusan'])->name('jurusan');

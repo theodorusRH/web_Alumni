@@ -4,14 +4,14 @@
 <div class="container">
     <h2>Tambah Pekerjaan - {{ $mahasiswa->nama }}</h2>
 
-    <form action="{{ route('pekerjaan.store', $mahasiswa->nrp) }}" method="POST">
+    <form action="{{ route('admin.pekerjaan.store', $mahasiswa->nrp) }}" method="POST">
         @csrf
 
         <div class="mb-3">
             <label for="idjenispekerjaan" class="form-label">Jenis Pekerjaan</label>
             <select name="idjenispekerjaan" id="idjenispekerjaan" class="form-control" required>
                 <option value="">-- Pilih Jenis Pekerjaan --</option>
-                @foreach(JenisPekerjaan::all() as $jenis)
+                @foreach($jenisPekerjaans as $jenis)
                 <option value="{{ $jenis->idjenispekerjaan }}" {{ old('idjenispekerjaan') == $jenis->idjenispekerjaan ? 'selected' : '' }}>
                     {{ $jenis->nama }}
                 </option>
@@ -79,4 +79,38 @@
         </div>
 
         <div class="mb-3">
-            <
+            <label for="kodepos" class="form-label">Kode Pos</label>
+            <input type="text" name="kodepos" id="kodepos" class="form-control" value="{{ old('kodepos') }}">
+            @error('kodepos')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
+            <label for="idpropinsi" class="form-label">Provinsi</label>
+            <select name="idpropinsi" id="idpropinsi" class="form-control" required>
+                <option value="">-- Pilih Provinsi --</option>
+                @foreach($propinsis as $prov)
+                <option value="{{ $prov->idpropinsi }}" {{ old('idpropinsi') == $prov->idpropinsi ? 'selected' : '' }}>
+                    {{ $prov->nama }}
+                </option>
+                @endforeach
+            </select>
+            @error('idpropinsi')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
+            <label for="jabatan" class="form-label">Jabatan</label>
+            <input type="text" name="jabatan" id="jabatan" class="form-control" value="{{ old('jabatan') }}">
+            @error('jabatan')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <button type="submit" class="btn btn-success">Simpan</button>
+        <a href="{{ route('admin.pekerjaan.index', $mahasiswa->nrp) }}" class="btn btn-secondary">Batal</a>
+    </form>
+</div>
+@endsection

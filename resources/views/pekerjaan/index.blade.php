@@ -7,6 +7,7 @@
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
+    <a href="{{ route('admin.pekerjaan.create', $mahasiswa->nrp) }}" class="btn btn-success mb-3">Tambah Pekerjaan</a>
 
     @if($pekerjaans->isEmpty())
         <p>Tidak ada data pekerjaan.</p>

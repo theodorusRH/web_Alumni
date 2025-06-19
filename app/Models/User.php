@@ -38,6 +38,16 @@ class User extends Authenticatable
         return $this->hasOne(Mahasiswa::class, 'nrp', 'id'); // user.id → mahasiswa.nrp
     }
 
+    public function pendidikan()
+    {
+        return $this->hasMany(\App\Models\Pendidikan::class, 'nrp', 'id');
+    }
+
+    public function pekerjaan()
+    {
+        return $this->hasMany(\App\Models\Pekerjaan::class, 'nrp', 'id');
+    }
+
     // Menggunakan username untuk autentikasi
     public function getAuthIdentifierName()
     {

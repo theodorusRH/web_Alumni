@@ -105,8 +105,18 @@
         </div>
 
         <button type="submit" class="btn btn-success">Update</button>
-        <a href="{{ route('admin.lowongan.index') }}" class="btn btn-secondary">Kembali</a>
     </form>
+    @auth
+        @if(Auth::user()->roles->name === 'alumni')
+            <div class="text-center mb-4">
+                <a href="{{ route('lowongan.mine') }}" class="btn btn-secondary">Kembali</a>
+            </div>
+        @elseif(Auth::user()->roles->name === 'admin')
+            <div class="text-center mb-4">
+                <a href="{{ route('admin.lowongan.index') }}" class="btn btn-secondary">Kembali</a>
+            </div>
+        @endif
+    @endauth
 </div>
 
 <script>

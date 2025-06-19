@@ -8,10 +8,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        body {
+            margin-top: 0;
+            padding-top: 0;
+        }
+
         .navbar-nav {
             flex: 1;
             justify-content: center;
         }
+
         .auth-buttons {
             margin-left: auto;
         }
@@ -27,24 +33,30 @@
             color: #0d6efd !important;
         }
 
-        /* Navbar link default style */
         .nav-link {
-            color: inherit; /* Warna default */
+            color: inherit;
             font-weight: normal;
             transition: color 0.2s ease;
         }
 
-        /* Navbar link saat hover */
         .nav-link:hover {
-            color: #0d6efd; /* Warna biru saat hover */
-            font-weight: 600; /* Bisa dibuat tebal saat hover */
+            color: #0d6efd;
+            font-weight: 600;
         }
 
-        /* Hilangkan style khusus untuk link aktif jika ada */
         .nav-link.text-primary,
         .nav-link.fw-bold {
             color: inherit !important;
             font-weight: normal !important;
+        }
+
+        .navbar-brand img {
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .container.mt-4 {
+            margin-top: 1rem !important; /* kurangi space */
         }
     </style>
 </head>
@@ -54,17 +66,25 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div class="container">
 
-        {{-- Web Alumni button --}}
+        {{-- Logo + Home Link --}}
         @auth
             @if(Auth::user()->isAdmin())
-                <a class="navbar-brand" href="{{ route('dashboard.index') }}">Web Alumni</a>
+                <a class="navbar-brand d-flex align-items-center" href="{{ route('dashboard.index') }}">
+                    <img src="{{ asset('images/kontak/LOGO_IKA_UBAYA.png') }}" alt="Logo UBAYA">
+                </a>
             @elseif(Auth::user()->isUser())
-                <a class="navbar-brand" href="{{ route('dashboard.user') }}">Web Alumni</a>
+                <a class="navbar-brand d-flex align-items-center" href="{{ route('dashboard.user') }}">
+                    <img src="{{ asset('images/kontak/LOGO_IKA_UBAYA.png') }}" alt="Logo UBAYA">
+                </a>
             @else
-                <a class="navbar-brand" href="{{ url('/') }}">Web Alumni</a>
+                <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
+                    <img src="{{ asset('images/kontak/LOGO_IKA_UBAYA.png') }}" alt="Logo UBAYA">
+                </a>
             @endif
         @else
-            <a class="navbar-brand" href="{{ url('/') }}">Web Alumni</a>
+            <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
+                <img src="{{ asset('images/kontak/LOGO_IKA_UBAYA.png') }}" alt="Logo UBAYA">
+            </a>
         @endauth
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -113,22 +133,24 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ route('dosen.tugasakhir') }}">Bimbingan TA</a></li>
-                                {{-- Tambah menu dosen lain di sini --}}
                             </ul>
                         </li>
                     @elseif(Auth::user()->roles->name === 'alumni')
                         <li class="nav-item mx-2">
-                            <a class="nav-link" href="{{ route('lowongan.index') }}">Lowongan</a>
+                            <a class="nav-link" href="{{ route('lowongan.mine') }}">My Lowongan</a>
                         </li>
                     @endif
                 @endauth
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="{{ route('lowongan.index') }}">Lowongan</a>
+                </li>
                 <li class="nav-item mx-2">
                     <a class="nav-link" href="{{ url('/kontak') }}">Kontak</a>
                 </li>
                 @auth
                     @if(Auth::user()->roles && Auth::user()->roles->name === 'admin')
                         <li class="nav-item mx-2">
-                            <a class="nav-link" href="{{ url('/pertanyaan') }}">Pertanyaan</a>
+                            <a class="nav-link" href="{{ route('admin.pertanyaan.index') }}">Pertanyaan</a>
                         </li>
                     @endif
                 @endauth
@@ -167,12 +189,12 @@
 </nav>
 @endif
 
-<div class="container mt-4">
+<div class="container mt-2">
     @yield('content')
 </div>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+{{-- 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const toggle = document.getElementById('togglePassword');
@@ -188,7 +210,26 @@
             });
         }
     });
+</script> --}}
+<script>
+    document.querySelectorAll('.toggle-password').forEach(function(toggle) {
+        toggle.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            }
+        });
+    });
 </script>
-{{-- @stack('scripts') --}}
+ @yield('js')
 </body>
 </html>

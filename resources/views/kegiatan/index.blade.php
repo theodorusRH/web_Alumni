@@ -19,7 +19,7 @@
                 <small>{{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}</small>
                 @if($item->foto)
                 <div>
-                    <img src="{{ asset('storage/' . $item->foto) }}" alt="Foto kegiatan" style="max-height: 100px; margin-top: 10px;">
+                    <img src="{{ asset('storage/'.$item->foto) }}" alt="Foto kegiatan" style="max-height: 100px; margin-top: 10px;">
                 </div>
                 @endif
             </a>

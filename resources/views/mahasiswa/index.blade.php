@@ -55,7 +55,7 @@
                             <ul style="list-style-type: none; padding-left: 0;">
                                 @foreach($mhs->pendidikan as $pend)
                                     <li>
-                                        <a href="{{ route('admin.pendidikan.index', ['nrp' => $mhs->nrp]) }}" style="margin-left:5px; padding: 2px 5px; background-color:#3490dc; color:white; text-decoration:none; border-radius: 3px;">
+                                        <a href="{{ route('admin.pendidikan.show', ['nrp' => $mhs->nrp]) }}" style="margin-left:5px; padding: 2px 5px; background-color:#3490dc; color:white; text-decoration:none; border-radius: 3px;">
                                             Lihat
                                         </a>
                                     </li>
@@ -71,7 +71,7 @@
                             <ul style="list-style-type: none; padding-left: 0;">
                                 @foreach($mhs->pekerjaan as $pek)
                                     <li>
-                                        <a href="{{ route('admin.pekerjaan.index', ['nrp' => $mhs->nrp]) }}" style="margin-left:5px; padding: 2px 5px; background-color:#38c172; color:white; text-decoration:none; border-radius: 3px;">
+                                        <a href="{{ route('admin.pekerjaan.show', ['nrp' => $mhs->nrp]) }}" style="margin-left:5px; padding: 2px 5px; background-color:#38c172; color:white; text-decoration:none; border-radius: 3px;">
                                             Lihat
                                         </a>
                                     </li>

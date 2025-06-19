@@ -49,7 +49,7 @@ class PendidikanController extends Controller
 
         Pendidikan::create($data);
 
-        return redirect()->route('pendidikan.index', $nrp)
+        return redirect()->route('admin.pendidikan.index', $nrp)
             ->with('success', 'Data pendidikan berhasil ditambahkan');
     }
 

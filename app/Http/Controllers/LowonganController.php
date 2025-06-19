@@ -11,53 +11,46 @@ class LowonganController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Lowongan::with('perusahaan')
-            ->where('isactive', 1)
-            ->orderBy('tanggal', 'desc');
+        $query = Lowongan::with('perusahaan')->orderBy('tanggal', 'desc');
 
-        // Contoh filter: filter berdasarkan perusahaan (optional)
         if ($request->filled('perusahaan_id')) {
-            $query->where('perusahaan_id', $request->perusahaan_id);
+            $query->where('idperusahaan', $request->perusahaan_id);
         }
 
-        // Contoh pencarian berdasarkan posisi atau judul lowongan (optional)
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('posisi', 'like', '%' . $searchTerm . '%')
-                ->orWhere('judul', 'like', '%' . $searchTerm . '%');
+                $q->where('jabatan', 'like', "%$searchTerm%")
+                  ->orWhere('deskripsi', 'like', "%$searchTerm%");
             });
         }
 
         $perPage = $request->get('per_page', 15);
         $lowongans = $query->paginate($perPage)->withQueryString();
-
-        $perusahaans = Perusahaan::where('isactive', 1)->get(); // untuk dropdown filter/input
+        $perusahaans = Perusahaan::where('isactive', 1)->get();
 
         return view('lowongan.index', compact('lowongans', 'perusahaans'));
     }
 
     public function publicIndex(Request $request)
     {
-        $query = Lowongan::with('perusahaan')
+        $lowongans = Lowongan::with('perusahaan')
             ->where('isactive', 1)
-            ->orderBy('tanggal', 'desc');
-
-        // Contoh pagination di publicIndex juga
-        $perPage = $request->get('per_page', 15);
-        $lowongans = $query->paginate($perPage)->withQueryString();
+            ->where('isapproved', 1)
+            ->latest()
+            ->get();
 
         return view('lowongan.publicindex', compact('lowongans'));
     }
 
-    public function create() {
+    public function create()
+    {
         $propinsis = Propinsi::where('isactive', 1)->get();
         return view('lowongan.create', compact('propinsis'));
     }
 
     public function storeLowongan(Request $request)
     {
-        // Validasi bisa lebih lengkap kalau perlu
         $request->validate([
             'jabatan' => 'required|string|max:255',
             'deskripsi' => 'required|string',
@@ -76,28 +69,27 @@ class LowonganController extends Controller
             'perusahaan.idpropinsi' => 'required|exists:propinsi,idpropinsi',
         ]);
 
-        // Simpan perusahaan dulu dengan userid
         $perusahaanData = $request->perusahaan;
-        $perusahaanData['userid'] = auth()->id(); // Tambahkan userid dari user yang sedang login
-        
+        $perusahaanData['userid'] = auth()->id();
         $perusahaan = Perusahaan::create($perusahaanData);
 
-        // Simpan lowongan dengan idperusahaan dari perusahaan yg baru dibuat
         $lowonganData = $request->only([
             'jabatan', 'deskripsi', 'kualifikasi', 'gajimin', 'gajimax', 'tanggal', 'tanggal_max', 'kirim'
         ]);
         $lowonganData['idperusahaan'] = $perusahaan->idperusahaan;
-        $lowonganData['userid'] = auth()->id(); // Tambahkan userid untuk lowongan
+        $lowonganData['userid'] = auth()->id();
+        $lowonganData['isapproved'] = false;
+        $lowonganData['isactive'] = true;
 
         Lowongan::create($lowonganData);
 
-        return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan dan perusahaan berhasil ditambahkan.');
+        return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil ditambahkan dan menunggu persetujuan.');
     }
 
     public function edit($id)
     {
         $lowongan = Lowongan::with('perusahaan')->findOrFail($id);
-        $propinsis = Propinsi::where('isactive', 1)->get(); // Tambahkan data propinsi untuk dropdown
+        $propinsis = Propinsi::where('isactive', 1)->get();
 
         return view('lowongan.edit', compact('lowongan', 'propinsis'));
     }
@@ -117,20 +109,18 @@ class LowonganController extends Controller
             'perusahaan.alamat' => 'required|string',
             'perusahaan.kota' => 'required|string|max:255',
             'perusahaan.telepon' => 'required|string|max:50',
-            'perusahaan.email' => 'nullable|email',  // Ubah menjadi nullable
+            'perusahaan.email' => 'nullable|email',
             'perusahaan.website' => 'nullable|url',
             'perusahaan.idpropinsi' => 'required|exists:propinsi,idpropinsi',
         ]);
 
         $lowongan = Lowongan::findOrFail($id);
-
-        // Update perusahaan dulu
         $perusahaan = Perusahaan::findOrFail($request->idperusahaan);
+
         $perusahaanData = $request->input('perusahaan');
-        $perusahaanData['userid'] = auth()->id(); // Tambahkan userid
+        $perusahaanData['userid'] = auth()->id();
         $perusahaan->update($perusahaanData);
 
-        // Update lowongan
         $lowongan->update([
             'jabatan' => $request->jabatan,
             'deskripsi' => $request->deskripsi,
@@ -139,20 +129,40 @@ class LowonganController extends Controller
             'gajimax' => $request->gajimax,
             'tanggal' => $request->tanggal,
             'tanggal_max' => $request->tanggal_max,
-            'kirim' => $request->kirim, // Tambahkan field kirim
+            'kirim' => $request->kirim,
             'idperusahaan' => $request->idperusahaan,
-            'userid' => auth()->id(), // Tambahkan userid untuk lowongan
+            'userid' => auth()->id(),
         ]);
 
-        return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan dan perusahaan berhasil diperbarui.');
+        return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil diperbarui.');
     }
 
-    // Hapus data lowongan
     public function destroyLowongan($id)
     {
         $lowongan = Lowongan::findOrFail($id);
         $lowongan->delete();
 
-        return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil dihapus.');
+        return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil dihapus.');
+    }
+
+    public function approve($id)
+    {
+        $lowongan = Lowongan::findOrFail($id);
+        $lowongan->isapproved = true;
+        $lowongan->save();
+
+        return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil disetujui.');
+    }
+
+    public function mine()
+    {
+        $user = auth()->user();
+
+        $lowongans = Lowongan::with('perusahaan')
+            ->where('userid', $user->username)
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('lowongan.mine', compact('lowongans'));
     }
 }

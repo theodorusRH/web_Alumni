@@ -26,7 +26,7 @@
                     <td>{{ $item->pesan }}</td>
                     <td>{{ $item->created_at->format('d M Y H:i') }}</td>
                     <td>
-                        <form action="{{ route('pertanyaan.destroy', $item->idpertanyaan) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus?')">
+                        <form action="{{ route('admin.pertanyaan.destroy', $item->idpertanyaan) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus?')">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-sm btn-danger">Hapus</button>

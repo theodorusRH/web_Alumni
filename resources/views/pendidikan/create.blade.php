@@ -4,7 +4,7 @@
 <div class="container">
     <h2>Tambah Pendidikan - {{ $mahasiswa->nama }}</h2>
 
-    <form action="{{ route('pendidikan.store', $mahasiswa->nrp) }}" method="POST">
+    <form action="{{ route('admin.pendidikan.store', $mahasiswa->nrp) }}" method="POST">
         @csrf
 
         <div class="mb-3">
@@ -55,7 +55,7 @@
         </div>
 
         <button type="submit" class="btn btn-success">Simpan</button>
-        <a href="{{ route('pendidikan.index', $mahasiswa->nrp) }}" class="btn btn-secondary">Batal</a>
+        <a href="{{ route('admin.pendidikan.index', $mahasiswa->nrp) }}" class="btn btn-secondary">Batal</a>
     </form>
 </div>
 @endsection
