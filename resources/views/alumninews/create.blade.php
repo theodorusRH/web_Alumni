@@ -25,7 +25,7 @@
     </div>
     <div class="mb-3">
         <label>Foto (opsional)</label>
-        <input type="file" name="foto" id="fotoInput" class="form-control" accept="image/*">
+        <input type="file" name="foto" id="fotoInput" class="form-control" accept="image/*" id="foto">
         <img id="fotoPreview" style="max-height: 150px; display: none; margin-top: 10px;" alt="Preview Foto">
     </div>
     <button class="btn btn-success">Simpan</button>

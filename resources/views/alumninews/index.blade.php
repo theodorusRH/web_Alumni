@@ -17,10 +17,13 @@
             <a href="{{ route('alumninews.show', $news->idalumninews) }}" class="list-group-item list-group-item-action">
                 <h5>{{ $news->judul }}</h5>
                 <small>{{ \Carbon\Carbon::parse($news->tanggalbuat)->format('d M Y') }}</small>
-                @if($news->foto)
+                @if($news->filenames)
+                @foreach ($news->filenames as $filename)
                 <div>
-                    <img src="{{ asset('storage/' . $news->foto) }}" style="max-height: 100px; margin-top: 10px;" alt="Foto berita">
+                    <img height='100px' width='150px' src="{{ asset('images/alumninews/' . $news->idalumninews . '/' . $filename) }}" />
+                    {{-- <img src="{{ asset('storage/' . $news->foto) }}" style="max-height: 100px; margin-top: 10px;" alt="Foto berita"> --}}
                 </div>
+                @endforeach
                 @endif
             </a>
 

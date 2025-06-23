@@ -50,7 +50,7 @@
                             <span style="color:red;">Belum Lulus</span>
                         @endif
                     </td>
-                    <td>
+                    {{-- <td>
                         @if($mhs->pendidikan->count() > 0)
                             <ul style="list-style-type: none; padding-left: 0;">
                                 @foreach($mhs->pendidikan as $pend)
@@ -64,9 +64,31 @@
                         @else
                             -
                         @endif
+                    </td> --}}
+                    <td>
+                        @if($mhs->pendidikan->count() > 0)
+                            <a href="{{ route('admin.pendidikan.show', ['nrp' => $mhs->nrp]) }}" 
+                            style="margin-left:5px; padding: 2px 5px; background-color:#3490dc; color:white; text-decoration:none; border-radius: 3px;">
+                                Lihat
+                            </a>
+                        @else
+                            -
+                        @endif
                     </td>
 
+
                     <td>
+                        @if($mhs->pekerjaan->count() > 0)
+                            <a href="{{ route('admin.pekerjaan.show', ['nrp' => $mhs->nrp]) }}" 
+                            style="margin-left:5px; padding: 2px 5px; background-color:#38c172; color:white; text-decoration:none; border-radius: 3px;">
+                                Lihat
+                            </a>
+                        @else
+                            -
+                        @endif
+                    </td>
+
+                    {{-- <td>
                         @if($mhs->pekerjaan->count() > 0)
                             <ul style="list-style-type: none; padding-left: 0;">
                                 @foreach($mhs->pekerjaan as $pek)
@@ -80,7 +102,7 @@
                         @else
                             -
                         @endif
-                    </td>
+                    </td> --}}
                 </tr>
             @empty
                 <tr>
