@@ -44,12 +44,58 @@
             {{-- Foto dan upload --}}
             <div class="col-md-4 text-center">
                 <label class="form-label fw-bold">Foto</label><br>
+
+                {{-- Tampilan foto lama --}}
                 @if ($user->foto)
-                    <img src="{{ asset('images/foto_user/' . $user->foto) }}" class="img-thumbnail mb-2" width="200">
+                    <img id="fotoPreviewLama" 
+                        src="{{ asset('images/foto_user/' . $user->foto) }}" 
+                        class="img-thumbnail mb-2 mx-auto d-block" 
+                        style="width: 200px; height: 200px; object-fit: cover; object-position: center; cursor: pointer;"
+                        alt="Foto Lama"
+                        data-bs-toggle="modal" data-bs-target="#fotoModal">
+                    <small class="text-muted d-block text-center">Foto Lama</small>
                 @else
-                    <div class="mb-2 border bg-light" style="width:200px; height:200px; display:inline-block;"></div>
+                    <img id="fotoPreviewLama" 
+                        class="img-thumbnail mb-2 mx-auto d-block" 
+                        style="width: 200px; height: 200px; object-fit: cover; object-position: center;"
+                        alt="Foto Lama">
+                    <small class="text-muted d-block text-center">Belum ada foto</small>
                 @endif
-                <input type="file" name="foto" class="form-control mt-2">
+
+                {{-- Preview foto baru --}}
+                <div id="fotoBaruContainer" class="mt-3 text-center" style="display: none;">
+                    <img id="fotoPreviewBaru" class="img-thumbnail" 
+                        style="width: 200px; height: 200px; object-fit: cover; object-position: center; cursor: pointer;" 
+                        alt="Foto Baru"
+                        data-bs-toggle="modal" data-bs-target="#fotoBaruModal">
+                    <small class="text-muted d-block">Preview Foto Baru</small>
+                </div>
+
+                <div class="modal fade" id="fotoBaruModal" tabindex="-1" aria-labelledby="fotoBaruModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-body text-center">
+                                <img id="modalFotoBaru" src="#" alt="Preview Besar Foto Baru" class="img-fluid rounded">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Input file --}}
+                <input type="file" name="foto" class="form-control mt-2" id="fotoInput">
+
+                {{-- Modal besar untuk zoom foto --}}
+                @if ($user->foto)
+                <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-body text-center">
+                                <img id="modalFoto" src="{{ asset('images/foto_user/' . $user->foto) }}" alt="Foto Besar" class="img-fluid rounded">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
 
             {{-- Input ID, Username, Password --}}
@@ -100,11 +146,41 @@
                     </div>
                     <div class="invalid-feedback" id="errorPasswordKonfirmasi"></div>
                 </div>
-
-
-
             </div>
         </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const input = document.getElementById('fotoInput');
+                const previewBaru = document.getElementById('fotoPreviewBaru');
+                const containerBaru = document.getElementById('fotoBaruContainer');
+                const modalImg = document.getElementById('modalFoto');
+                const thumbnail = document.getElementById('fotoPreviewLama');
+
+                // Klik gambar lama untuk lihat modal
+                if (thumbnail && modalImg && thumbnail.src) {
+                    thumbnail.addEventListener('click', function () {
+                        if (this.src) {
+                            modalImg.src = this.src;
+                        }
+                    });
+                }
+
+                // Preview gambar baru
+                input.addEventListener('change', function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            previewBaru.src = e.target.result;
+                            modalFotoBaru.src = e.target.result;
+                            containerBaru.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+            </script>
 
         @if ($user->roles->name === 'alumni')
         <hr>

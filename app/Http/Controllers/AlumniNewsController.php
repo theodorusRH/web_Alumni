@@ -44,16 +44,32 @@ class AlumniNewsController extends Controller
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $data = $request->all();
+        // Ambil data utama
+        $data = $request->only('judul', 'isi');
         $data['userid'] = Auth::user()->username ?? 'admin';
         $data['tanggalbuat'] = now();
         $data['isactive'] = 1;
 
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('alumninews', 'public');
-        }
+        // Buat record terlebih dahulu tanpa foto
+        $berita = AlumniNews::create($data);
 
-        AlumniNews::create($data);
+        if ($request->hasFile('foto')) {
+            // Buat folder berdasarkan ID berita
+            $path = public_path('images/alumninews/' . $berita->idalumninews);
+
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true); // buat folder jika belum ada
+            }
+
+            // Simpan file ke folder tersebut
+            $file = $request->file('foto');
+            $filename = $file->getClientOriginalName();
+            $file->move($path, $filename);
+
+            // Update kolom foto di database
+            $berita->foto = $filename;
+            $berita->save();
+        }
 
         return redirect()->route('admin.alumninews.index')->with('success', 'Berita berhasil ditambahkan');
     }
@@ -80,19 +96,29 @@ class AlumniNewsController extends Controller
 
         // Jika ada file foto baru di-upload
         if ($request->hasFile('foto')) {
+            $path = public_path('images/alumninews/' . $alumninews->idalumninews);
+
+            // Buat folder jika belum ada
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+
             // Hapus file lama jika ada
-            if ($alumninews->foto && \Storage::disk('public')->exists($alumninews->foto)) {
-                \Storage::disk('public')->delete($alumninews->foto);
+            if ($alumninews->foto && file_exists($path . '/' . $alumninews->foto)) {
+                unlink($path . '/' . $alumninews->foto);
             }
 
             // Simpan file baru
-            $alumninews->foto = $request->file('foto')->store('alumninews', 'public');
+            $file = $request->file('foto');
+            $filename = $file->getClientOriginalName();
+            $file->move($path, $filename);
+
+            // Simpan nama file ke kolom
+            $alumninews->foto = $filename;
         }
 
-        // Simpan perubahan ke database
         $alumninews->save();
 
-        // Redirect dengan pesan sukses
         return redirect()->route('admin.alumninews.index')->with('success', 'Berita berhasil diperbarui.');
     }
 

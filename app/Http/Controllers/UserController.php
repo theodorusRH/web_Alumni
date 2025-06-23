@@ -19,7 +19,14 @@ class UserController extends Controller
     public function index()
     {
         $user = auth()->user();
-        return view('dashboard.user', ['user' => $user]);
+        $mahasiswa  = $user->mahasiswa; 
+        $pendidikans = $user->pendidikan()->with('jurusan')->get();
+        $pekerjaans = $user->pekerjaan()->with(['jenisPekerjaan', 'propinsi'])->get();
+        $tugasAkhir = $mahasiswa?->tugasAkhir()?->with(['dosen1', 'dosen2'])->first(); 
+
+        return view('dashboard.user', compact(
+            'user', 'mahasiswa', 'tugasAkhir', 'pendidikans', 'pekerjaans'
+        ));
     }
 
     public function profile()

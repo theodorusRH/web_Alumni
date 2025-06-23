@@ -5,7 +5,7 @@
 <p><small>{{ \Carbon\Carbon::parse($kegiatan->tanggal)->format('d M Y') }}</small></p>
 
 @if ($kegiatan->foto)
-    <img src="{{ asset('storage/' . $kegiatan->foto) }}" alt="Foto kegiatan" class="img-fluid mb-4" style="max-width: 100%; height: auto;">
+    <img src="{{ asset('images/kegiatan/' . $kegiatan->id . '/' . $kegiatan->foto) }}" alt="Foto kegiatan" class="img-fluid mb-4" style="max-width: 100%; height: auto;">
 @endif
 
 <p>{!! nl2br(e($kegiatan->deskripsi)) !!}</p>

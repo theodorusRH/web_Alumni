@@ -36,20 +36,34 @@ class KegiatanController extends Controller
             'judul' => 'required',
             'tanggal' => 'required|date',
             'deskripsi' => 'required',
-            'foto' => 'nullable|image|max:2048', // validasi foto opsional
+            'foto' => 'nullable|image|max:2048',
         ]);
 
         $data = $request->only('judul', 'tanggal', 'deskripsi');
 
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('kegiatan', 'public');
-        }
+        // Buat data kegiatan dulu tanpa foto
+        $kegiatan = Kegiatan::create($data);
 
-        Kegiatan::create($data);
+        if ($request->hasFile('foto')) {
+            // Buat folder berdasarkan ID kegiatan
+            $path = public_path('images/kegiatan/' . $kegiatan->id);
+
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true); // buat folder jika belum ada
+            }
+
+            // Simpan file ke folder tersebut
+            $file = $request->file('foto');
+            $filename = $file->getClientOriginalName();
+            $file->move($path, $filename);
+
+            // Simpan nama file ke kolom `foto` di database (jika ada)
+            $kegiatan->foto = $filename;
+            $kegiatan->save();
+        }
 
         return redirect()->route('admin.kegiatan.index')->with('success', 'Kegiatan berhasil ditambahkan.');
     }
-
 
     public function edit($id) {
         $kegiatan = Kegiatan::findOrFail($id);
@@ -63,7 +77,7 @@ class KegiatanController extends Controller
             'judul' => 'required',
             'tanggal' => 'required|date',
             'deskripsi' => 'required',
-            'foto' => 'nullable|image|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Cari data kegiatan berdasarkan ID
@@ -76,13 +90,25 @@ class KegiatanController extends Controller
 
         // Jika ada file foto baru di-upload
         if ($request->hasFile('foto')) {
+            $path = public_path('images/kegiatan/' . $kegiatan->id);
+
+            // Buat folder jika belum ada
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+
             // Hapus file lama jika ada
-            if ($kegiatan->foto && \Storage::disk('public')->exists($kegiatan->foto)) {
-                \Storage::disk('public')->delete($kegiatan->foto);
+            if ($kegiatan->foto && file_exists($path . '/' . $kegiatan->foto)) {
+                unlink($path . '/' . $kegiatan->foto);
             }
 
             // Simpan file baru
-            $kegiatan->foto = $request->file('foto')->store('kegiatan', 'public');
+            $file = $request->file('foto');
+            $filename = $file->getClientOriginalName();
+            $file->move($path, $filename);
+
+            // Simpan nama file ke kolom
+            $kegiatan->foto = $filename;
         }
 
         // Simpan perubahan ke database
