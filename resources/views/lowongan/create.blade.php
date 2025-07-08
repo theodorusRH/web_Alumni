@@ -104,7 +104,7 @@
             </div>
         @elseif(Auth::user()->roles->name === 'admin')
             <div class="text-center mb-4">
-                <a href="{{ route('lowongan.index') }}" class="btn btn-secondary">Kembali</a>
+                <a href="{{ route('admin.lowongan.index') }}" class="btn btn-secondary">Kembali</a>
             </div>
         @endif
     @endauth

@@ -21,6 +21,7 @@ class Lowongan extends Model
         'tanggal',
         'tanggal_max',
         'isactive',
+        'isapproved',
         'kirim',
         'idperusahaan',
         'userid'

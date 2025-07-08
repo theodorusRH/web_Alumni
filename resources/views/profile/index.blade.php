@@ -180,7 +180,7 @@
                     }
                 });
             });
-            </script>
+        </script>
 
         @if ($user->roles->name === 'alumni')
         <hr>
@@ -252,6 +252,8 @@
             </div>
 
             <div class="tab-pane fade" id="pendidikan" role="tabpanel">
+                <a href="#" class="btn btn-info mb-2" data-bs-toggle="modal" data-bs-target="#modalCreatePendidikan">Tambah</a>
+
                 <h5 class="mt-3">Riwayat Pendidikan</h5>
                 <table class="table table-bordered">
                     <thead>
@@ -261,7 +263,7 @@
                             <th>Angkatan</th>
                             <th>Tanggal Lulus</th>
                             <th>IPK</th>
-                            <th>Aksi</th>
+                            {{-- <th>Aksi</th> --}}
                         </tr>
                     </thead>
                     <tbody>
@@ -274,7 +276,7 @@
                             <td>{{ $p->ipk }}</td>
                             <td>
                                 <a href="#modalPendidikanEdit" class="btn btn-info" data-toggle="modal"
-                                onclick="getPendidikanEditForm('{{ $p->nrp }}', '{{ $p->idjurusan }}')">Edit</a>
+                                onclick="getPendidikanEditForm('{{ $p->id }}')">Edit</a>
                             </td>
                         </tr>
                         @endforeach
@@ -282,12 +284,14 @@
                 </table>
             </div>
 
-
             <div class="tab-pane fade" id="pekerjaan" role="tabpanel">
+                <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modalCreatePekerjaan">Tambah</a>
+
                 <h5 class="mt-3">Riwayat Pekerjaan</h5>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th>Jenis Pekerjaan</th>
                             <th>Perusahaan</th>
                             <th>Telepon</th>
                             <th>Mulai Kerja</th>
@@ -317,7 +321,7 @@
                             <td>{{ $p->jabatan }}</td>
                             <td>
                                 <a href="#modalPekerjaanEdit" class="btn btn-info" data-toggle="modal"
-                                onclick="getPekerjaanEditForm('{{ $p->nrp }}', '{{ $p->idjenispekerjaan }}')">Edit</a>
+                                onclick="getPekerjaanEditForm('{{ $p->id }}')">Edit</a>
                             </td>
                         </tr>
                         @endforeach
@@ -330,24 +334,169 @@
     </form>
 </div>
 
-<div class="modal fade" id="modalPendidikanEdit" tabindex="-1" role="basic" aria-hidden="true">
-    <div class="modal-dialog modal-wide">
-        <div class="modal-content">
-            <div class="modal-body" id="modalContent">
-                
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="modalPekerjaanEdit" tabindex="-1" role="basic" aria-hidden="true">
-    <div class="modal-dialog modal-wide">
+@if ($user->roles->name === 'alumni')
+<div class="modal fade" id="modalPekerjaanEdit" tabindex="-1">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-body" id="modalPekerjaanContent">
-                {{-- konten AJAX akan muncul di sini --}}
+                <!-- Form akan dimuat via AJAX -->
             </div>
         </div>
     </div>
 </div>
+@endif
+
+@if ($user->roles->name === 'alumni')
+<div class="modal fade" id="modalPendidikanEdit" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body" id="modalPendidikanContent">
+                <!-- Form akan dimuat via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@if ($user->roles->name === 'alumni')
+<div class="modal fade" id="modalCreatePendidikan" tabindex="-1" role="dialog" aria-labelledby="modalCreatePendidikanLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ route('profile.storePendidikan') }}">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Riwayat Pendidikan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label>Jurusan</label>
+                        <select name="idjurusan" class="form-control" required>
+                            <option value="">-- Pilih Jurusan --</option>
+                            @foreach ($jurusanList as $jur)
+                                <option value="{{ $jur->idjurusan }}">{{ $jur->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Jumlah Semester</label>
+                        <input type="number" name="jmlsemester" class="form-control" min="1" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Angkatan</label>
+                        <input type="text" name="angkatan" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Tanggal Lulus</label>
+                        <input type="date" name="tanggallulus" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>IPK</label>
+                        <input type="text" name="ipk" class="form-control" placeholder="Contoh: 3.75">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
+
+@if ($user->roles->name === 'alumni')
+<div class="modal fade" id="modalCreatePekerjaan" tabindex="-1" role="dialog" aria-labelledby="modalCreatePekerjaanLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ route('profile.storePekerjaan') }}">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Riwayat Pekerjaan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Jenis Pekerjaan</label>
+                        <select name="idjenispekerjaan" class="form-control">
+                            <option value="">-- Pilih Jenis Pekerjaan --</option>
+                            @foreach ($jenisPekerjaanList as $jp)
+                                <option value="{{ $jp->idjenispekerjaan }}">{{ $jp->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Perusahaan</label>
+                        <input type="text" name="perusahaan" class="form-control" placeholder="Nama perusahaan">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Telepon</label>
+                        <input type="text" name="telepon" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Mulai Kerja</label>
+                        <input type="date" name="mulaikerja" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Gaji Pertama</label>
+                        <input type="number" name="gajipertama" class="form-control" step="1000">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Alamat</label>
+                        <input type="text" name="alamat" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Kota</label>
+                        <input type="text" name="kota" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Kode Pos</label>
+                        <input type="text" name="kodepos" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Provinsi</label>
+                        <select name="idpropinsi" class="form-control">
+                            <option value="">-- Pilih Provinsi --</option>
+                            @foreach ($propinsiList as $prov)
+                                <option value="{{ $prov->idpropinsi }}">{{ $prov->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Bidang Usaha</label>
+                        <input type="text" name="bidangusaha" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Jabatan</label>
+                        <input type="text" name="jabatan" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 
 @endsection
 
@@ -407,50 +556,14 @@
             }
         });
     });
-    
-    function getPendidikanEditForm(nrp, idjurusan) {
-        $.ajax({
-            type: 'POST',
-            url: '{{ route("profile.getPendidikanEditForm") }}',
-            data: {
-                _token: '{{ csrf_token() }}',
-                nrp: nrp,
-                idjurusan: idjurusan
-            },
-            success: function(data) {
-                $('#modalContent').html(data.msg);
-                $('#modalPendidikanEdit').modal('show');
 
-                const angkatanInput = document.querySelector('#modalPendidikanEdit input[name="angkatan"]');
-                const ipkInput = document.querySelector('#modalPendidikanEdit input[name="ipk"]');
-
-                if (angkatanInput) {
-                    angkatanInput.addEventListener('input', function () {
-                        this.value = this.value.replace(/[^0-9]/g, '');
-                    });
-                }
-
-                if (ipkInput) {
-                    ipkInput.addEventListener('input', function () {
-                        this.value = this.value.replace(/[^0-9.]/g, '');
-                        const parts = this.value.split('.');
-                        if (parts.length > 2) {
-                            this.value = parts[0] + '.' + parts.slice(1).join('').replace(/\./g, '');
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-    function getPekerjaanEditForm(nrp, idjenispekerjaan) {
+    function getPekerjaanEditForm(pekerjaan_id) {
         $.ajax({
             type: 'POST',
             url: '{{ route("profile.getPekerjaanEditForm") }}',
             data: {
-                _token: '{{ csrf_token() }}',
-                nrp: nrp,
-                idjenispekerjaan: idjenispekerjaan
+                '_token': '{{ csrf_token() }}',
+                'id': pekerjaan_id
             },
             success: function(data) {
                 $('#modalPekerjaanContent').html(data.msg);
@@ -458,5 +571,21 @@
             }
         });
     }
+
+    function getPendidikanEditForm(pendidikan_id) {
+        $.ajax({
+            type: 'POST',
+            url: '{{ route("profile.getPendidikanEditForm") }}',
+            data: {
+                '_token': '{{ csrf_token() }}',
+                'id': pendidikan_id
+            },
+            success: function(data) {
+                $('#modalPendidikanContent').html(data.msg);
+                $('#modalPendidikanEdit').modal('show');
+            }
+        });
+    }
+
 </script>
 @endsection

@@ -16,28 +16,28 @@ return new class extends Migration
             $table->dropForeign(['nrp']);
         });
 
+        // Hapus primary key composite lama
         DB::statement('ALTER TABLE pekerjaan DROP PRIMARY KEY');
 
         Schema::table('pekerjaan', function (Blueprint $table) {
-            // Tambah primary key gabungan
-            $table->primary(['nrp', 'idjenispekerjaan', 'idpropinsi']);
+            // Tambah kolom id sebagai primary key baru
+            $table->increments('id')->first();
 
-            // Tambahkan foreign key lagi
+            // Tambahkan kembali foreign key ke tabel mahasiswa
             $table->foreign('nrp')->references('nrp')->on('mahasiswa')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('pekerjaan', function (Blueprint $table) {
+            // Hapus foreign key dan kolom id
             $table->dropForeign(['nrp']);
-            $table->dropPrimary();
+            $table->dropColumn('id');
         });
 
-        DB::statement('ALTER TABLE pekerjaan ADD PRIMARY KEY (nrp)');
+        // Kembalikan primary key composite lama
+        DB::statement('ALTER TABLE pekerjaan ADD PRIMARY KEY (nrp, idjenispekerjaan, idpropinsi)');
 
         Schema::table('pekerjaan', function (Blueprint $table) {
             $table->foreign('nrp')->references('nrp')->on('mahasiswa')->onDelete('cascade');

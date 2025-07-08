@@ -26,5 +26,10 @@ class Propinsi extends Model
     {
         return $this->hasMany(Perusahaan::class, 'idpropinsi', 'idpropinsi');
     }
+
+    public function pekerjaan()
+    {
+        return $this->hasMany(Pekerjaan::class, 'idpropinsi', 'idpropinsi');
+    }
 }
 

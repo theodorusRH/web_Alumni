@@ -10,8 +10,6 @@ class Pekerjaan extends Model
     use HasFactory;
 
     protected $table = 'pekerjaan';
-    protected $primaryKey = 'nrp';
-    public $incrementing = false;
     
     protected $fillable = [
         'nrp',

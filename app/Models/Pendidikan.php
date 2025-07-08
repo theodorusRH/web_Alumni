@@ -10,8 +10,6 @@ class Pendidikan extends Model
     use HasFactory;
 
     protected $table = 'pendidikan';
-    protected $primaryKey = ['nrp', 'idjurusan'];
-    public $incrementing = false;
     
     protected $fillable = [
         'nrp',

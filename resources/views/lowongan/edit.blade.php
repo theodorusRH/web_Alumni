@@ -15,7 +15,10 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.lowongan.update', $lowongan->idlowongan) }}" method="POST">
+    {{-- <form action="{{ route('admin.lowongan.update', $lowongan->idlowongan) }}" method="POST"> --}}
+    <form action="{{ Auth::user()->roles->name === 'admin' 
+            ? route('admin.lowongan.update', $lowongan->idlowongan) 
+            : route('lowongan.update', $lowongan->idlowongan) }}" method="POST">
         @csrf
         @method('PUT')
 

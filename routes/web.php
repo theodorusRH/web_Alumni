@@ -57,17 +57,23 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
     
-    Route::post('/profile/getPendidikanEditForm', [UserController::class, 'getPendidikanEditForm'])->name('profile.getPendidikanEditForm');
-    Route::put('/profile/pendidikan/{nrp}/{idjurusan}', [UserController::class, 'updatePendidikan'])->name('profile.updatePendidikan');
+    // Route::post('/profile/getPendidikanEditForm', [UserController::class, 'getPendidikanEditForm'])->name('profile.getPendidikanEditForm');
+    // Route::put('/profile/pendidikan/{id}', [UserController::class, 'updatePendidikan'])->name('profile.updatePendidikan');
 
+    Route::post('/profile/pendidikan/store', [UserController::class, 'storePendidikan'])->name('profile.storePendidikan');
+    Route::post('/profile/getPendidikanEditForm', [UserController::class, 'getPendidikanEditForm'])->name('profile.getPendidikanEditForm');
+    Route::put('/profile/pendidikan/{id}', [UserController::class, 'updatePendidikan'])->name('profile.updatePendidikan');
+
+    Route::post('/profile/pekerjaan/store', [UserController::class, 'storePekerjaan'])->name('profile.storePekerjaan');
     Route::post('/profile/getPekerjaanEditForm', [UserController::class, 'getPekerjaanEditForm'])->name('profile.getPekerjaanEditForm');
-    Route::put('/profile/pekerjaan/{nrp}/{idjenispekerjaan}', [UserController::class, 'updatePekerjaan'])->name('profile.updatePekerjaan');
+    Route::put('/profile/pekerjaan/{id}', [UserController::class, 'updatePekerjaan'])->name('profile.updatePekerjaan');
 
     Route::get('/lowongan/{id}/edit', [LowonganController::class, 'edit'])->name('lowongan.edit');
     Route::get('/lowongan/create', [LowonganController::class, 'create'])->name('lowongan.create');
     Route::post('/lowongan', [LowonganController::class, 'storeLowongan'])->name('lowongan.store');
     Route::get('/lowongan/saya', [LowonganController::class, 'mine'])->name('lowongan.mine');
 
+    Route::put('/lowongan/{id}', [LowonganController::class, 'updateLowongan'])->name('lowongan.update');
 });
 
 //DOSEN
@@ -80,6 +86,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/mahasiswa', [MahasiswaController::class, 'storeMahasiswa'])->name('mahasiswa.store');
     Route::put('/mahasiswa/{nrp}', [MahasiswaController::class, 'updateMahasiswa'])->name('mahasiswa.update');
     Route::delete('/mahasiswa/{nrp}', [MahasiswaController::class, 'destroyMahasiswa'])->name('mahasiswa.destroy');
+    Route::patch('/mahasiswa/{nrp}/toggle-status', [MahasiswaController::class, 'toggleStatus'])->name('mahasiswa.toggleStatus');
 
     Route::get('/alumni', [AlumniController::class, 'alumni'])->name('alumni');
 

@@ -13,8 +13,8 @@
             Status Kelulusan:
             <select name="iscomplete" onchange="this.form.submit()">
                 <option value="">-- Semua --</option>
-                <option value="1" {{ request('iscomplete') == '1' ? 'selected' : '' }}>Sudah Lulus</option>
-                <option value="0" {{ request('iscomplete') == '0' ? 'selected' : '' }}>Belum Lulus</option>
+                <option value="1" {{ request('iscomplete') == '1' ? 'selected' : '' }}>Aktif</option>
+                <option value="0" {{ request('iscomplete') == '0' ? 'selected' : '' }}>Tidak Aktif</option>
             </select>
         </label>
 
@@ -30,7 +30,8 @@
                 <th>Jenis Kelamin</th>
                 <th>Provinsi</th>
                 <th>Kota</th>
-                <th>Status Kelulusan</th>
+                <th>Status</th>
+                <th>action</th>
                 <th>Pendidikan</th>
                 <th>Pekerjaan</th>
             </tr>
@@ -45,11 +46,24 @@
                     <td>{{ $mhs->kota }}</td>
                     <td>
                         @if ($mhs->iscomplete)
-                            <span style="color:green; font-weight:bold;">Sudah Lulus</span>
+                            <span style="color:green; font-weight:bold;">Aktif</span>
                         @else
-                            <span style="color:red;">Belum Lulus</span>
+                            <span style="color:red;">Tidak Aktif</span>
                         @endif
                     </td>
+                    <td>
+                        <form action="{{ route('admin.mahasiswa.toggleStatus', $mhs->nrp) }}" method="POST" onsubmit="return confirm('Ubah status kelulusan mahasiswa ini?')">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit"
+                                style="padding: 4px 8px; border: none; border-radius: 3px; cursor: pointer;
+                                    background-color: {{ $mhs->iscomplete ? '#dc3545' : '#28a745' }};
+                                    color: white;">
+                                {{ $mhs->iscomplete ? 'Nonaktifkan' : 'Aktifkan' }}
+                            </button>
+                        </form>
+                    </td>
+
                     {{-- <td>
                         @if($mhs->pendidikan->count() > 0)
                             <ul style="list-style-type: none; padding-left: 0;">
