@@ -19,5 +19,15 @@
         <tr><th>Provinsi</th><td>{{ $mahasiswa->propinsi->nama ?? '-' }}</td></tr>
     </table>
 
-    <a href="{{ route('admin.mahasiswa.index') }}" style="margin-top: 20px; display: inline-block;">← Kembali ke Daftar</a>
+    @php
+        $backToMahasiswa = Auth::user()->roles->name === 'admin'
+            ? route('admin.mahasiswa.index')
+            : route('dosen.mahasiswa.index');
+    @endphp
+
+    <form action="{{ $backToMahasiswa }}" method="GET" style="margin-top: 20px;">
+        <button type="submit" class="btn btn-secondary">
+            ← Kembali ke Daftar
+        </button>
+    </form>
 @endsection

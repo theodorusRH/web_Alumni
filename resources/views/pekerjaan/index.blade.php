@@ -44,6 +44,13 @@
         </table>
     @endif
 
-    <a href="{{ route('admin.mahasiswa.index', $mahasiswa->nrp) }}" class="btn btn-secondary mt-3">Kembali ke Mahasiswa</a>
+    @php
+        $backToMahasiswa = Auth::user()->roles->name === 'admin'
+            ? route('admin.mahasiswa.index')
+            : route('dosen.mahasiswa.index');
+    @endphp
+
+    <a href="{{ $backToMahasiswa }}" class="btn btn-secondary mt-3">Kembali ke Mahasiswa</a>
+
 </div>
 @endsection

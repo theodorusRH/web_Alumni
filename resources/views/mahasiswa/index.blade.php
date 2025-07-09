@@ -1,9 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Daftar Mahasiswa</h1>
+    @php
+        $mahasiswaIndexRoute = Auth::user()->roles->name === 'admin'
+            ? route('admin.mahasiswa.index')
+            : route('dosen.mahasiswa.index');
+    @endphp
 
-    <form method="GET" action="{{ route('admin.mahasiswa.index') }}" class="mb-4">
+    <h1>
+        @if(Auth::user()->roles->name === 'admin')
+            Daftar Mahasiswa
+        @else
+            Daftar Mahasiswa
+        @endif
+    </h1>
+
+    <form method="GET" action="{{ $mahasiswaIndexRoute }}" class="mb-4">
         <label>
             Cari Nama atau NRP:
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau NRP...">
@@ -24,7 +36,7 @@
         </label>
 
         <button type="submit">Filter</button>
-        <a href="{{ route('admin.mahasiswa.index') }}">Reset</a>
+        <a href="{{ $mahasiswaIndexRoute }}">Reset</a>
     </form>
 
     <table border="1" cellpadding="8" cellspacing="0" width="100%">
@@ -37,7 +49,9 @@
                 <th>Provinsi</th>
                 <th>Kota</th>
                 <th>Status</th>
-                <th>action</th>
+                @if(Auth::user()->roles->name === 'admin')
+                    <th>Action</th>
+                @endif
                 <th>Pendidikan</th>
                 <th>Pekerjaan</th>
                 <th>Detail</th>
@@ -59,22 +73,26 @@
                             <span style="color:red;">Tidak Aktif</span>
                         @endif
                     </td>
-                    <td>
-                        <form action="{{ route('admin.mahasiswa.toggleStatus', $mhs->nrp) }}" method="POST" onsubmit="return confirm('Ubah status Aktif alumni ini?')">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit"
-                                style="padding: 4px 8px; border: none; border-radius: 3px; cursor: pointer;
-                                    background-color: {{ $mhs->iscomplete ? '#dc3545' : '#28a745' }};
-                                    color: white;">
-                                {{ $mhs->iscomplete ? 'Nonaktifkan' : 'Aktifkan' }}
-                            </button>
-                        </form>
-                    </td>
+
+                    @if(Auth::user()->roles->name === 'admin')
+                        <td>
+                            <form action="{{ route('admin.mahasiswa.toggleStatus', $mhs->nrp) }}" method="POST" onsubmit="return confirm('Ubah status Aktif alumni ini?')">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit"
+                                    style="padding: 4px 8px; border: none; border-radius: 3px; cursor: pointer;
+                                        background-color: {{ $mhs->iscomplete ? '#dc3545' : '#28a745' }};
+                                        color: white;">
+                                    {{ $mhs->iscomplete ? 'Nonaktifkan' : 'Aktifkan' }}
+                                </button>
+                            </form>
+                        </td>
+                    @endif
+
                     <td>
                         @if($mhs->pendidikan->count() > 0)
-                            <a href="{{ route('admin.pendidikan.show', ['nrp' => $mhs->nrp]) }}" 
-                            style="margin-left:5px; padding: 2px 5px; background-color:#3490dc; color:white; text-decoration:none; border-radius: 3px;">
+                            <a href="{{ route('pendidikan.show', ['nrp' => $mhs->nrp]) }}" 
+                               style="margin-left:5px; padding: 2px 5px; background-color:#3490dc; color:white; text-decoration:none; border-radius: 3px;">
                                 Lihat
                             </a>
                         @else
@@ -83,8 +101,8 @@
                     </td>
                     <td>
                         @if($mhs->pekerjaan->count() > 0)
-                            <a href="{{ route('admin.pekerjaan.show', ['nrp' => $mhs->nrp]) }}" 
-                            style="margin-left:5px; padding: 2px 5px; background-color:#38c172; color:white; text-decoration:none; border-radius: 3px;">
+                            <a href="{{ route('pekerjaan.show', ['nrp' => $mhs->nrp]) }}" 
+                               style="margin-left:5px; padding: 2px 5px; background-color:#38c172; color:white; text-decoration:none; border-radius: 3px;">
                                 Lihat
                             </a>
                         @else
@@ -92,31 +110,15 @@
                         @endif
                     </td>
                     <td>
-                        <a href="{{ route('admin.mahasiswa.showDetail', $mhs->nrp) }}" 
-                        style="padding: 4px 8px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 3px;">
+                        <a href="{{ route('mahasiswa.showDetail', $mhs->nrp) }}" 
+                           style="padding: 4px 8px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 3px;">
                             Lihat Detail
                         </a>
                     </td>
-
-                    {{-- <td>
-                        @if($mhs->pekerjaan->count() > 0)
-                            <ul style="list-style-type: none; padding-left: 0;">
-                                @foreach($mhs->pekerjaan as $pek)
-                                    <li>
-                                        <a href="{{ route('admin.pekerjaan.show', ['nrp' => $mhs->nrp]) }}" style="margin-left:5px; padding: 2px 5px; background-color:#38c172; color:white; text-decoration:none; border-radius: 3px;">
-                                            Lihat
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            -
-                        @endif
-                    </td> --}}
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" style="text-align:center;">Data mahasiswa tidak ditemukan.</td>
+                    <td colspan="11" style="text-align:center;">Data mahasiswa tidak ditemukan.</td>
                 </tr>
             @endforelse
         </tbody>

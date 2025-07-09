@@ -79,20 +79,32 @@ Route::middleware(['auth'])->group(function () {
 //DOSEN
 Route::middleware(['auth'])->get('/dosen/tugasakhir', [DosenController::class, 'index'])->name('dosen.tugasakhir');
 
+// Untuk admin
+Route::middleware(['auth', 'admin'])->get('/admin/mahasiswa', [MahasiswaController::class, 'index'])->name('admin.mahasiswa.index');
+
+// Route untuk dosen
+Route::middleware(['auth'])->prefix('dosen')->name('dosen.')->group(function () {
+    Route::get('/mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa.index');
+});
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/pendidikan/{nrp}', [PendidikanController::class, 'index'])->name('pendidikan.show');
+    Route::get('/pekerjaan/{nrp}', [PekerjaanController::class, 'index'])->name('pekerjaan.show');
+    Route::get('/mahasiswa/{nrp}', [MahasiswaController::class, 'showDetail'])->name('mahasiswa.showDetail');
+});
+
 // Admin-only routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa.index');
     Route::get('/mahasiswa/{nrp}', [MahasiswaController::class, 'detailMahasiswa'])->name('mahasiswa.detail');
     Route::post('/mahasiswa', [MahasiswaController::class, 'storeMahasiswa'])->name('mahasiswa.store');
     Route::put('/mahasiswa/{nrp}', [MahasiswaController::class, 'updateMahasiswa'])->name('mahasiswa.update');
     Route::delete('/mahasiswa/{nrp}', [MahasiswaController::class, 'destroyMahasiswa'])->name('mahasiswa.destroy');
     Route::patch('/mahasiswa/{nrp}/toggle-status', [MahasiswaController::class, 'toggleStatus'])->name('mahasiswa.toggleStatus');
-    Route::get('/mahasiswa/{nrp}', [MahasiswaController::class, 'showDetail'])->name('mahasiswa.showDetail');
 
     Route::get('/alumni', [AlumniController::class, 'alumni'])->name('alumni');
 
     Route::get('/pendidikan', [PendidikanController::class, 'index'])->name('pendidikan.index');
-    Route::get('/pendidikan/{nrp}', [PendidikanController::class, 'index'])->name('pendidikan.show');
     Route::get('/pendidikan/create/{nrp}', [PendidikanController::class, 'create'])->name('pendidikan.create');
     Route::post('/pendidikan/{nrp}', [PendidikanController::class, 'store'])->name('pendidikan.store');
     Route::put('/pendidikan/{id}', [PendidikanController::class, 'update'])->name('pendidikan.update');
@@ -101,7 +113,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Route::get('/pekerjaan', [PekerjaanController::class, 'index'])->name('pekerjaan.index');
 
     Route::get('/pekerjaan', [PekerjaanController::class, 'index'])->name('pekerjaan.index');
-    Route::get('/pekerjaan/{nrp}', [PekerjaanController::class, 'index'])->name('pekerjaan.show');
     Route::get('/pekerjaan/create/{nrp}', [PekerjaanController::class, 'create'])->name('pekerjaan.create');
     Route::post('/pekerjaan/{nrp}', [PekerjaanController::class, 'store'])->name('pekerjaan.store');
     Route::put('/pekerjaan/{nrp}/{idjenispekerjaan}/{idpropinsi}', [PekerjaanController::class, 'updatePekerjaan'])->name('pekerjaan.update');
@@ -158,4 +169,5 @@ Route::middleware(['auth'])->prefix('api')->name('api.')->group(function () {
     Route::get('/perusahaan', [MahasiswaController::class, 'getPerusahaan'])->name('perusahaan');
     Route::get('/lowongan', [MahasiswaController::class, 'getLowongan'])->name('lowongan');
     Route::get('/statistics', [MahasiswaController::class, 'getStatistics'])->name('statistics');
+    Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 });

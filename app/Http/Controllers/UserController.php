@@ -111,6 +111,22 @@ class UserController extends Controller
             }
         }
 
+        $request->validate([
+            'judul' => 'required|string',
+            'kode_dosen1' => 'required|exists:dosen,kode',
+            'kode_dosen2' => 'nullable|exists:dosen,kode',
+            'tanggal_lulus_ta' => 'nullable|date',
+        ]);
+
+        $ta = TugasAkhir::findOrFail($id);
+
+        $ta->update([
+            'judul' => $request->judul,
+            'kode_dosen1' => $request->kode_dosen1,
+            'kode_dosen2' => $request->kode_dosen2,
+            'tanggal_lulus_ta' => $request->tanggal_lulus_ta,
+        ]);
+
         return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui.');
     }
 
@@ -271,4 +287,32 @@ class UserController extends Controller
         }
         
     }
+
+    public function storeTugasAkhir(Request $request)
+    {
+        $request->validate([
+            'judul' => 'required|string',
+            'kode_dosen1' => 'required|exists:dosen,kode',
+            'kode_dosen2' => 'nullable|exists:dosen,kode',
+            'tanggal_lulus_ta' => 'nullable|date',
+        ]);
+
+        $user = auth()->user();
+        $mahasiswa = Mahasiswa::where('nrp', $user->id)->first();
+
+        if (!$mahasiswa) {
+            return back()->withErrors(['msg' => 'Data mahasiswa tidak ditemukan.']);
+        }
+
+        TugasAkhir::create([
+            'nrp' => $mahasiswa->nrp,
+            'judul' => $request->judul,
+            'kode_dosen1' => $request->kode_dosen1,
+            'kode_dosen2' => $request->kode_dosen2,
+            'tanggal_lulus_ta' => $request->tanggal_lulus_ta,
+        ]);
+
+        return redirect()->route('profile')->with('status', 'Tugas Akhir berhasil ditambahkan.');
+    }
+
 }

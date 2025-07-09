@@ -232,22 +232,51 @@
             {{-- @endif --}}
 
             {{-- @if ($tugasAkhir && $user->roles->name === 'alumni') --}}
-            <div class="tab-pane fade" id="tugasAkhir" role="tabpanel">
+            <div class="tab-pane fade show active" id="tugasAkhir" role="tabpanel">
                 <h5 class="mt-3">Data Tugas Akhir</h5>
-                <div class="mb-3"><label>Judul</label>
-                    <input type="text" class="form-control" value="{{ $tugasAkhir->judul }}" readonly>
+
+                <div class="mb-3">
+                    <label>Judul</label>
+                    <input type="text" name="judul" class="form-control" value="{{ $tugasAkhir->judul ?? '' }}">
                 </div>
-                <div class="mb-3"><label>Dosen Pembimbing 1</label>
-                    <input type="text" class="form-control" value="{{ $tugasAkhir->dosen1->nama ?? '-' }}" readonly>
+
+                <div class="mb-3">
+                    <label>Dosen Pembimbing 1</label>
+                    <select name="kode_dosen1" class="form-control">
+                        @if (isset($tugasAkhir) && $tugasAkhir->dosen1)
+                            <option selected hidden value="{{ $tugasAkhir->kode_dosen1 }}">{{ $tugasAkhir->dosen1->nama }}</option>
+                        @else
+                            <option value="" selected hidden>-- Pilih Dosen --</option>
+                        @endif
+
+                        @foreach ($dosenList as $dosen)
+                            <option value="{{ $dosen->nip }}">
+                                {{ $dosen->nama }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-                <div class="mb-3"><label>Dosen Pembimbing 2</label>
-                    <input type="text" class="form-control" value="{{ $tugasAkhir->dosen2->nama ?? '-' }}" readonly>
+
+                <div class="mb-3">
+                    <label>Dosen Pembimbing 2</label>
+                    <select name="kode_dosen2" class="form-control">
+                        @if (isset($tugasAkhir) && $tugasAkhir->dosen2)
+                            <option selected hidden value="{{ $tugasAkhir->kode_dosen2 }}">{{ $tugasAkhir->dosen2->nama }}</option>
+                        @else
+                            <option value="" selected hidden>-- Pilih Dosen --</option>
+                        @endif
+
+                        @foreach ($dosenList as $dosen)
+                            <option value="{{ $dosen->nip }}">
+                                {{ $dosen->nama }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-                <div class="mb-3"><label>Nilai</label>
-                    <input type="text" class="form-control" value="{{ $tugasAkhir->nilai_ta }}" readonly>
-                </div>
-                <div class="mb-3"><label>Tanggal Lulus</label>
-                    <input type="text" class="form-control" value="{{ $tugasAkhir->tanggal_lulus_ta }}" readonly>
+
+                <div class="mb-3">
+                    <label>Tanggal Lulus</label>
+                    <input type="date" name="tanggal_lulus_ta" class="form-control" value="{{ $tugasAkhir->tanggal_lulus_ta ?? '' }}">
                 </div>
             </div>
 

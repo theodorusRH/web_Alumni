@@ -133,6 +133,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ route('dosen.tugasakhir') }}">Bimbingan TA</a></li>
+                                <li><a class="dropdown-item" href="{{ route('dosen.mahasiswa.index') }}">Mahasiswa</a></li>
                             </ul>
                         </li>
                     @elseif(Auth::user()->roles->name === 'alumni')

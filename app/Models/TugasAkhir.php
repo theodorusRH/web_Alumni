@@ -17,11 +17,7 @@ class TugasAkhir extends Model
         'judul',
         'kode_dosen1',
         'kode_dosen2',
-        'lulus_ta',
-        'selesai_kuliah',
-        'nilai_ta',
         'tanggal_lulus_ta',
-        'editable'
     ];
 
     public function mahasiswa()
