@@ -3,64 +3,70 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Employee;
 use App\Models\User;
-use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RegisterController extends Controller
 {
     public function showForm()
     {
-        $role = Role::where('status_active', 1)->get();
-        $gender = $this->getGender('employees', 'gender');
-        return view('auth.register',compact('role','gender'));
+        return view('auth.register');
     }
 
     public function register(Request $request)
     {
         $request->validate([
-            'name'        => 'required',
-            'phone'       => 'required',
-            'email'       => 'required|email|unique:employees,email',
-            'username'    => 'required|string|unique:users,username',
-            'password'    => 'required',
-            'address'     => 'required',
-            'gender'      => 'required',
-            'roles_id'    => 'required'
+            'nrp' => 'required|unique:users,id|unique:mahasiswa,nrp',
+            'username' => 'required|string|max:50|unique:users,username',
+            'password' => 'required|min:6|confirmed',
+            'nama' => 'required|string|max:40',
+            'email' => 'required|email|max:50',
         ]);
 
-        // $employee = new Employee();
-        // $employee->name          = $request->name;
-        // $employee->phone_number  = $request->phone;
-        // $employee->email         = $request->email;
-        // $employee->address       = $request->address;
-        // $employee->gender        = $request->gender;
-        // $employee->status_active = 1;
-        // $employee->save();
+        Log::info('Register attempt', $request->only(['nrp', 'username', 'nama', 'email']));
 
-        $user = new User();
-        $user->username      = $request->username;
-        $user->password      = Hash::make($request->password);
-        $user->roles_id      = $request->roles_id;
-        $user->employees_id  = $employee->id;
-        $user->status_active = 1;
-        $user->save();
+        DB::beginTransaction();
+        try {
+            User::create([
+                'id' => $request->nrp,
+                'username' => $request->username,
+                'password' => Hash::make($request->password),
+                'roles_id' => 2,
+                'status_active' => 0,
+            ]);
 
-        return redirect()->route('login')->with('success', 'Akun berhasil dibuat. Silakan login.');
-    }
+            DB::table('mahasiswa')->insert([
+                'nrp' => $request->nrp,
+                'nama' => $request->nama,
+                'alamat' => null,
+                'kota' => null,
+                'kodepos' => null,
+                'sex' => null,
+                'email' => $request->email,
+                'telepon' => null,
+                'hp' => null,
+                'tmptlahir' => null,
+                'tgllahir' => null,
+                'alamatluarkota' => null,
+                'kotaluarkota' => null,
+                'kodeposluarkota' => null,
+                'teleponluarkota' => null,
+                'idpropinsi' => 35,
+                'iscomplete' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
-    public function getGender($table, $column)
-    {
-        $type = DB::select("SHOW COLUMNS FROM {$table} WHERE Field = '{$column}'")[0]->Type;
-    
-        preg_match('/^enum\((.*)\)$/', $type, $matches);
-        $enum = [];
-        foreach(explode(',', $matches[1]) as $value) {
-            $enum[] = trim($value, "'");
+            DB::commit();
+            Log::info('Register success', ['nrp' => $request->nrp]);
+
+            return redirect()->route('home')->with('success', 'Pendaftaran berhasil. Silakan login setelah aktivasi.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Register failed', ['error' => $e->getMessage()]);
+            return redirect()->back()->withErrors('Gagal mendaftar: ' . $e->getMessage())->withInput();
         }
-        return $enum;
     }
 }
-

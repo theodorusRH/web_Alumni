@@ -10,6 +10,7 @@ use App\Models\Pendidikan;
 use App\Models\Pekerjaan;
 use App\Models\Dosen;
 use App\Models\JenisPekerjaan;
+use App\Models\Jurusan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -22,7 +23,7 @@ class UserController extends Controller
         $mahasiswa  = $user->mahasiswa; 
         $pendidikans = $user->pendidikan()->with('jurusan')->get();
         $pekerjaans = $user->pekerjaan()->with(['jenisPekerjaan', 'propinsi'])->get();
-        $tugasAkhir = $mahasiswa?->tugasAkhir()?->with(['dosen1', 'dosen2'])->first(); 
+        $tugasAkhir = $mahasiswa?->tugasAkhir()?->with(['dosen1', 'dosen2'])->first();
 
         return view('dashboard.user', compact(
             'user', 'mahasiswa', 'tugasAkhir', 'pendidikans', 'pekerjaans'
@@ -40,9 +41,12 @@ class UserController extends Controller
 
         $propinsiList = DB::table('propinsi')->get();
         $dosenList = Dosen::all();
+        $jenisPekerjaanList = JenisPekerjaan::all();
+        $jurusanList = Jurusan::all();
 
         return view('profile.index', compact(
-            'user', 'mahasiswa', 'tugasAkhir', 'pendidikans', 'pekerjaans', 'propinsiList', 'dosenList'
+            'user', 'mahasiswa', 'tugasAkhir', 'pendidikans', 'pekerjaans', 'propinsiList', 'dosenList',
+            'jenisPekerjaanList','jurusanList'
         ));
     }
 
@@ -110,88 +114,161 @@ class UserController extends Controller
         return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui.');
     }
 
-    public function getPendidikanEditForm(Request $request)
-    {
-        $nrp = $request->nrp;
-        $idjurusan = $request->idjurusan;
-
-        $data = Pendidikan::where('nrp', $nrp)
-                        ->where('idjurusan', $idjurusan)
-                        ->first();
-
-        if (!$data) {
-            return response()->json(['error' => 'Data not found.'], 404);
-        }
-
-        return response()->json([
-            'status' => 'oke',
-            'msg' => view('profile.getPendidikanEditForm', compact('data'))->render()
-        ]);
-    }
-
-    public function updatePendidikan(Request $request, $nrp, $idjurusan)
+    public function storePendidikan(Request $request)
     {
         $request->validate([
+            'idjurusan' => 'required|exists:jurusan,idjurusan',
+            'jmlsemester'=> 'required',
             'angkatan' => 'required|digits:4|integer|min:1900|max:' . date('Y'),
             'tanggallulus' => 'required|date',
             'ipk' => 'required|numeric|between:0,4.00',
         ]);
 
-        Pendidikan::where('nrp', $nrp)
-            ->where('idjurusan', $idjurusan)
-            ->update($request->only(['angkatan', 'tanggallulus', 'ipk']));
+        $data = new Pendidikan();
+        $data->nrp = auth()->user()->id;
+        $data->idjurusan = $request->idjurusan;
+        $data->angkatan = $request->angkatan;
+        $data->jmlsemester = $request->jmlsemester;
+        $data->tanggallulus = $request->tanggallulus;
+        $data->ipk = $request->ipk;
+        $data->save();
+
+        return redirect()->route('profile')->with('status', 'Data pendidikan berhasil ditambahkan.');
+    }
+
+    public function getPendidikanEditForm(Request $request)
+    {
+        $id = $request->id;
+        $data = Pendidikan::find($id);
+    
+        if (!$data) {
+            return response()->json(['error' => 'Data not found.'], 404);
+        }
+    
+        $jurusanList = Jurusan::all();
+    
+        return response()->json([
+            'status' => 'oke',
+            'msg' => view('profile.getPendidikanEditForm', compact('data', 'jurusanList'))->render()
+        ], 200);
+    }
+    
+
+    public function updatePendidikan(Request $request, $id)
+    {
+        $request->validate([
+            'angkatan' => 'required|digits:4|integer|min:1900|max:' . date('Y'),
+            'jmlsemester'=> 'required',
+            'tanggallulus' => 'required|date',
+            'ipk' => 'required|numeric|between:0,4.00',
+        ]);
+
+        $data = Pendidikan::findOrFail($id);
+        $data->angkatan = $request->angkatan;
+        $data->jmlsemester = $request->jmlsemester;
+        $data->tanggallulus = $request->tanggallulus;
+        $data->ipk = $request->ipk;
+        $data->save();
 
         return redirect()->route('profile')->with('status', 'Data pendidikan berhasil diperbarui.');
     }
 
+
+    public function storePekerjaan(Request $request)
+    {
+        try
+        {
+            $request->validate([
+                'idjenispekerjaan' => 'required|exists:jenispekerjaan,idjenispekerjaan',
+                'bidangusaha' => 'required|string|max:255',
+                'perusahaan' => 'nullable|string|max:255',
+                'telepon' => 'nullable|string|max:50',
+                'mulaikerja' => 'nullable|date',
+                'gajipertama' => 'nullable|numeric',
+                'alamat' => 'nullable|string|max:255',
+                'kota' => 'nullable|string|max:100',
+                'kodepos' => 'nullable|string|max:10',
+                'idpropinsi' => 'required|exists:propinsi,idpropinsi',
+                'jabatan' => 'nullable|string|max:100',
+            ]);
+
+            $data = new Pekerjaan();
+            $data->nrp = auth()->user()->id;
+            $data->idjenispekerjaan = $request->idjenispekerjaan;
+            $data->bidangusaha = $request->bidangusaha;
+            $data->perusahaan = $request->perusahaan;
+            $data->telepon = $request->telepon;
+            $data->mulaikerja = $request->mulaikerja;
+            $data->gajipertama = $request->gajipertama;
+            $data->alamat = $request->alamat;
+            $data->kota = $request->kota;
+            $data->kodepos = $request->kodepos;
+            $data->idpropinsi = $request->idpropinsi;
+            $data->jabatan = $request->jabatan;
+            $data->save();
+
+            return redirect()->route('profile.index')->with('status', 'Horray! Your data is successfully added!');
+
+        } catch (\Exception $e) {
+            return back()->with('status', 'Error: ' . $e->getMessage());
+        }
+    }
+
     public function getPekerjaanEditForm(Request $request)
     {
-        $nrp = $request->nrp;
-        $idjenispekerjaan = $request->idjenispekerjaan;
-
-        $data = Pekerjaan::where('nrp', $nrp)
-            ->where('idjenispekerjaan', $idjenispekerjaan)
-            ->first();
-
+        $id = $request->id;
+        $data = Pekerjaan::find($id);
+    
         if (!$data) {
-            return response()->json(['error' => 'Data tidak ditemukan'], 404);
+            return response()->json(['error' => 'Data not found.'], 404);
         }
-
+    
         $propinsiList = Propinsi::all();
         $jenisPekerjaanList = JenisPekerjaan::all();
-
+    
         return response()->json([
             'status' => 'oke',
             'msg' => view('profile.getPekerjaanEditForm', compact('data', 'propinsiList','jenisPekerjaanList'))->render()
-        ]);
+        ], 200);
     }
 
-    public function updatePekerjaan(Request $request, $nrp, $idjenispekerjaan)
+    public function updatePekerjaan(Request $request, $id)
     {
         $request->validate([
-            'bidangusaha' => 'required|string|max:30',
-            'perusahaan' => 'required|string|max:45',
-            'telepon' => 'required|string|max:20',
-            'mulaikerja' => 'required|date',
-            'gajipertama' => 'required|numeric',
-            'alamat' => 'required|string|max:50',
-            'kota' => 'required|string|max:20',
-            'kodepos' => 'required|string|max:5',
-            'idpropinsi' => 'required|numeric',
-            'jabatan' => 'required|string|max:30',
+            'idjenispekerjaan' => 'required|exists:jenispekerjaan,idjenispekerjaan',
+            'bidangusaha' => 'required|string|max:255',
+            'perusahaan' => 'nullable|string|max:255',
+            'telepon' => 'nullable|string|max:50',
+            'mulaikerja' => 'nullable|date',
+            'gajipertama' => 'nullable|numeric',
+            'alamat' => 'nullable|string|max:255',
+            'kota' => 'nullable|string|max:100',
+            'kodepos' => 'nullable|string|max:10',
+            'idpropinsi' => 'required|exists:propinsi,idpropinsi',
+            'jabatan' => 'nullable|string|max:100',
         ]);
 
-        $data = Pekerjaan::where('nrp', $nrp)
-            ->where('idjenispekerjaan', $idjenispekerjaan)
-            ->firstOrFail();
+        try{
+            $data = Pekerjaan::find($id);
+            $data->idjenispekerjaan = $request->idjenispekerjaan;
+            $data->bidangusaha = $request->bidangusaha;
+            $data->perusahaan = $request->perusahaan;
+            $data->telepon = $request->telepon;
+            $data->mulaikerja = $request->mulaikerja;
+            $data->gajipertama = $request->gajipertama;
+            $data->alamat = $request->alamat;
+            $data->kota = $request->kota;
+            $data->kodepos = $request->kodepos;
+            $data->idpropinsi = $request->idpropinsi;
+            $data->jabatan = $request->jabatan;
+            $data->save();
+            // Log::error('Update Error', ['error' => $e->getMessage()]);
 
-        $data->update($request->only([
-            'bidangusaha', 'perusahaan', 'telepon', 'mulaikerja', 'gajipertama',
-            'alamat', 'kota', 'kodepos', 'idpropinsi', 'jabatan'
-        ]));
-
-        return redirect()->route('profile')->with('success', 'Data pekerjaan berhasil diperbarui.');
+            return redirect()->route('profile.index')->with('status', 'Data updated!');
+        }catch (\Exception $e) {
+            // Log::error('Update Error', ['error' => $e->getMessage()]);
+            return redirect()->back()->withErrors('Gagal mendaftar: ' . $e->getMessage())->withInput();
+        }
+        
     }
-
-
 }

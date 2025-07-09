@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Lowongan;
 use App\Models\Perusahaan;
 use App\Models\Propinsi;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class LowonganController extends Controller
@@ -73,17 +75,27 @@ class LowonganController extends Controller
         $perusahaanData['userid'] = auth()->id();
         $perusahaan = Perusahaan::create($perusahaanData);
 
+        $isAdmin = auth()->user()->roles->name === 'admin';
+
         $lowonganData = $request->only([
             'jabatan', 'deskripsi', 'kualifikasi', 'gajimin', 'gajimax', 'tanggal', 'tanggal_max', 'kirim'
         ]);
         $lowonganData['idperusahaan'] = $perusahaan->idperusahaan;
         $lowonganData['userid'] = auth()->id();
-        $lowonganData['isapproved'] = false;
+        $lowonganData['isapproved'] = $isAdmin ? true : false;
         $lowonganData['isactive'] = true;
 
         Lowongan::create($lowonganData);
 
-        return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil ditambahkan dan menunggu persetujuan.');
+        $user = auth()->user();
+
+        if ($user->roles->name == 'admin') {
+            return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil ditambahkan dan sudah disetujui.');
+        } else {
+            return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil ditambahkan dan menunggu persetujuan.');
+        }
+
+        // return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil ditambahkan dan menunggu persetujuan.');
     }
 
     public function edit($id)
@@ -134,7 +146,15 @@ class LowonganController extends Controller
             'userid' => auth()->id(),
         ]);
 
-        return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil diperbarui.');
+        // return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil diperbarui.');
+
+        $user = auth()->user();
+        
+        if ($user->roles->name == 'admin') {
+            return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil diperbarui.');
+        } else {
+            return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil diperbarui.');
+        }
     }
 
     public function destroyLowongan($id)
@@ -142,7 +162,14 @@ class LowonganController extends Controller
         $lowongan = Lowongan::findOrFail($id);
         $lowongan->delete();
 
-        return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil dihapus.');
+        $user = auth()->user();
+        
+        if ($user->roles->name == 'admin') {
+            return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil dihapus.');
+        } else {
+            return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil dihapus.');
+        }
+        // return redirect()->route('lowongan.mine')->with('success', 'Lowongan berhasil dihapus.');
     }
 
     public function approve($id)

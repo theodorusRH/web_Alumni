@@ -11,7 +11,8 @@ class MahasiswaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Mahasiswa::with(['propinsi', 'pendidikan']);
+        $query = Mahasiswa::with(['propinsi', 'pendidikan'])
+                            ->orderBy('created_at', 'asc');
 
         // Filter status kelulusan (iscomplete)
         if ($request->filled('iscomplete')) {
@@ -37,6 +38,10 @@ class MahasiswaController extends Controller
             });
         }
 
+        // Filter berdasarkan angkatan
+        if ($request->filled('angkatan')) {
+            $query->where('angkatan', 'like', '%' . $request->angkatan . '%');
+        }
         // Pagination
         $perPage = $request->get('per_page', 15);
         $mahasiswa = $query->paginate($perPage)->withQueryString();
@@ -62,6 +67,12 @@ class MahasiswaController extends Controller
         return view('mahasiswa.show', compact('mahasiswa'));
     }
 
+    public function showDetail($nrp)
+    {
+        $mahasiswa = Mahasiswa::with('propinsi')->findOrFail($nrp);
+        return view('mahasiswa.show', compact('mahasiswa'));
+    }
+
     public function export(Request $request)
     {
         // Logic untuk export data (CSV, Excel, PDF)
@@ -77,4 +88,23 @@ class MahasiswaController extends Controller
         // Return export file (implementation depends on chosen export library)
         return response()->json(['message' => 'Export functionality to be implemented']);
     }
+
+    public function toggleStatus($nrp)
+    {
+        $mahasiswa = Mahasiswa::with('user')->findOrFail($nrp);
+        
+        // Toggle status kelulusan mahasiswa
+        $mahasiswa->iscomplete = !$mahasiswa->iscomplete;
+        $mahasiswa->save();
+
+        // Toggle juga status user yang terkait
+        if ($mahasiswa->user) {
+            $mahasiswa->user->status_active = $mahasiswa->iscomplete ? 1 : 0;
+            $mahasiswa->user->save();
+        }
+
+        return redirect()->back()->with('success', 'Status Mahasiswa dan User berhasil diperbarui.');
+    }
+
+
 }

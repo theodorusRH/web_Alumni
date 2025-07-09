@@ -9,8 +9,13 @@
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau NRP...">
         </label>
 
+        <label style="margin-left: 20px;">
+            Cari Angkatan:
+            <input type="text" name="angkatan" value="{{ request('angkatan') }}" placeholder="Contoh: 2021">
+        </label>
+
         <label>
-            Status Kelulusan:
+            Status Aktif:
             <select name="iscomplete" onchange="this.form.submit()">
                 <option value="">-- Semua --</option>
                 <option value="1" {{ request('iscomplete') == '1' ? 'selected' : '' }}>Aktif</option>
@@ -26,6 +31,7 @@
         <thead>
             <tr>
                 <th>NRP</th>
+                <th>Angkatan</th>
                 <th>Nama</th>
                 <th>Jenis Kelamin</th>
                 <th>Provinsi</th>
@@ -34,12 +40,14 @@
                 <th>action</th>
                 <th>Pendidikan</th>
                 <th>Pekerjaan</th>
+                <th>Detail</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($mahasiswa as $mhs)
                 <tr>
                     <td>{{ $mhs->nrp }}</td>
+                    <td>{{ $mhs->angkatan }}</td>
                     <td>{{ $mhs->nama }}</td>
                     <td>{{ $mhs->sex }}</td>
                     <td>{{ $mhs->propinsi->nama ?? '-' }}</td>
@@ -52,7 +60,7 @@
                         @endif
                     </td>
                     <td>
-                        <form action="{{ route('admin.mahasiswa.toggleStatus', $mhs->nrp) }}" method="POST" onsubmit="return confirm('Ubah status kelulusan mahasiswa ini?')">
+                        <form action="{{ route('admin.mahasiswa.toggleStatus', $mhs->nrp) }}" method="POST" onsubmit="return confirm('Ubah status Aktif alumni ini?')">
                             @csrf
                             @method('PATCH')
                             <button type="submit"
@@ -63,22 +71,6 @@
                             </button>
                         </form>
                     </td>
-
-                    {{-- <td>
-                        @if($mhs->pendidikan->count() > 0)
-                            <ul style="list-style-type: none; padding-left: 0;">
-                                @foreach($mhs->pendidikan as $pend)
-                                    <li>
-                                        <a href="{{ route('admin.pendidikan.show', ['nrp' => $mhs->nrp]) }}" style="margin-left:5px; padding: 2px 5px; background-color:#3490dc; color:white; text-decoration:none; border-radius: 3px;">
-                                            Lihat
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            -
-                        @endif
-                    </td> --}}
                     <td>
                         @if($mhs->pendidikan->count() > 0)
                             <a href="{{ route('admin.pendidikan.show', ['nrp' => $mhs->nrp]) }}" 
@@ -89,8 +81,6 @@
                             -
                         @endif
                     </td>
-
-
                     <td>
                         @if($mhs->pekerjaan->count() > 0)
                             <a href="{{ route('admin.pekerjaan.show', ['nrp' => $mhs->nrp]) }}" 
@@ -100,6 +90,12 @@
                         @else
                             -
                         @endif
+                    </td>
+                    <td>
+                        <a href="{{ route('admin.mahasiswa.showDetail', $mhs->nrp) }}" 
+                        style="padding: 4px 8px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 3px;">
+                            Lihat Detail
+                        </a>
                     </td>
 
                     {{-- <td>

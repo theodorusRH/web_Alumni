@@ -66,24 +66,24 @@ class KontakController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
-    {
-        $request->validate([
-            'alamat' => 'nullable|string|max:50',
-            'email' => 'nullable|email|max:50',
-            'telepon' => 'nullable|string|max:20',
-            'lokasi' => 'nullable|string',
-            'gps' => 'nullable|string',
-            'website' => 'nullable|string|max:45',
-            'instagram' => 'nullable|string|max:45',
-            'twitter' => 'nullable|string|max:45',
-        ]);
+    // public function update(Request $request)
+    // {
+    //     $request->validate([
+    //         'alamat' => 'nullable|string|max:50',
+    //         'email' => 'nullable|email|max:50',
+    //         'telepon' => 'nullable|string|max:20',
+    //         'lokasi' => 'nullable|string',
+    //         'gps' => 'nullable|string',
+    //         'website' => 'nullable|string|max:45',
+    //         'instagram' => 'nullable|string|max:45',
+    //         'twitter' => 'nullable|string|max:45',
+    //     ]);
 
-        $kontak = Kontak::first(); // diasumsikan hanya 1 data
-        $kontak->update($request->all());
+    //     $kontak = Kontak::first();
+    //     $kontak->update($request->all());
 
-        return back()->with('success', 'Kontak berhasil diperbarui.');
-    }
+    //     return back()->with('success', 'Kontak berhasil diperbarui.');
+    // }
 
     /**
      * Remove the specified resource from storage.
