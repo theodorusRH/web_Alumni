@@ -96,6 +96,9 @@ Route::middleware(['auth'])->group(function () {
 
 // Admin-only routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa.index');
+
+
     Route::get('/mahasiswa/{nrp}', [MahasiswaController::class, 'detailMahasiswa'])->name('mahasiswa.detail');
     Route::post('/mahasiswa', [MahasiswaController::class, 'storeMahasiswa'])->name('mahasiswa.store');
     Route::put('/mahasiswa/{nrp}', [MahasiswaController::class, 'updateMahasiswa'])->name('mahasiswa.update');
@@ -103,7 +106,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/mahasiswa/{nrp}/toggle-status', [MahasiswaController::class, 'toggleStatus'])->name('mahasiswa.toggleStatus');
 
     Route::get('/alumni', [AlumniController::class, 'alumni'])->name('alumni');
-
+    Route::get('/pendidikan/{nrp}', [PendidikanController::class, 'index'])->name('pendidikan.show');
     Route::get('/pendidikan', [PendidikanController::class, 'index'])->name('pendidikan.index');
     Route::get('/pendidikan/create/{nrp}', [PendidikanController::class, 'create'])->name('pendidikan.create');
     Route::post('/pendidikan/{nrp}', [PendidikanController::class, 'store'])->name('pendidikan.store');
@@ -111,7 +114,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/pendidikan/{id}', [PendidikanController::class, 'destroy'])->name('pendidikan.destroy');
 
     // Route::get('/pekerjaan', [PekerjaanController::class, 'index'])->name('pekerjaan.index');
-
+    Route::get('/pekerjaan/{nrp}', [PekerjaanController::class, 'index'])->name('pekerjaan.show');
     Route::get('/pekerjaan', [PekerjaanController::class, 'index'])->name('pekerjaan.index');
     Route::get('/pekerjaan/create/{nrp}', [PekerjaanController::class, 'create'])->name('pekerjaan.create');
     Route::post('/pekerjaan/{nrp}', [PekerjaanController::class, 'store'])->name('pekerjaan.store');

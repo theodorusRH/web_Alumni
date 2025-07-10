@@ -15,13 +15,13 @@
     <div class="row align-items-start">
         {{-- Kiri: Info Kampus --}}
         <div class="col-md-6 mb-4">
-            <h4 class="mb-3">Kunjungi Kami Di Kampus<br><span class="text-primary">UBAYA Ngagel</span></h4>
+            <h4 class="mb-3">Kunjungi Kami Di Kampus<br><span class="text-primary">UBAYA Rungkut</span></h4>
             <p>{{ $kontak->alamat }}</p>
             <a href="{{ $kontak->gps }}" class="text-warning text-decoration-none fw-semibold" target="_blank">
                 Get Directions
             </a>
             <div class="mt-4">
-                <img src="{{ asset('images/kontak/LOGO_IKA_UBAYA.png') }}" alt="Logo UBAYA" width="80">
+                <img src="{{ asset('images/kontak/ifubaya.png') }}" alt="Logo UBAYA" width="200" height="100">
                 <p class="mt-2 text-muted small">{{ $kontak->email }}</p>
 
                 {{-- <div class="mt-4 text-center">

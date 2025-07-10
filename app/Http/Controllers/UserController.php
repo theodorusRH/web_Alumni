@@ -23,7 +23,9 @@ class UserController extends Controller
         $mahasiswa  = $user->mahasiswa; 
         $pendidikans = $user->pendidikan()->with('jurusan')->get();
         $pekerjaans = $user->pekerjaan()->with(['jenisPekerjaan', 'propinsi'])->get();
-        $tugasAkhir = $mahasiswa?->tugasAkhir()?->with(['dosen1', 'dosen2'])->first();
+        // $tugasAkhir = $mahasiswa?->tugasAkhir()?->with(['dosen1', 'dosen2'])->first();
+        $tugasAkhir = $user->tugasAkhir()->with(['dosen1', 'dosen2'])->first();
+
 
         return view('dashboard.user', compact(
             'user', 'mahasiswa', 'tugasAkhir', 'pendidikans', 'pekerjaans'
@@ -37,7 +39,8 @@ class UserController extends Controller
         $mahasiswa = $user->mahasiswa;
         $pendidikans = $user->pendidikan()->with('jurusan')->get();
         $pekerjaans = $user->pekerjaan()->with(['jenisPekerjaan', 'propinsi'])->get();
-        $tugasAkhir = $mahasiswa?->tugasAkhir()?->with(['dosen1', 'dosen2'])->first();
+        // $tugasAkhir = $mahasiswa?->tugasAkhir()?->with(['dosen1', 'dosen2'])->first();
+        $tugasAkhir = $user->tugasAkhir()->with(['dosen1', 'dosen2'])->first();
 
         $propinsiList = DB::table('propinsi')->get();
         $dosenList = Dosen::all();
@@ -118,14 +121,25 @@ class UserController extends Controller
             'tanggal_lulus_ta' => 'nullable|date',
         ]);
 
-        $ta = TugasAkhir::findOrFail($id);
+        $ta = TugasAkhir::where('nrp', $user->id)->first();
 
-        $ta->update([
-            'judul' => $request->judul,
-            'kode_dosen1' => $request->kode_dosen1,
-            'kode_dosen2' => $request->kode_dosen2,
-            'tanggal_lulus_ta' => $request->tanggal_lulus_ta,
-        ]);
+        if ($ta) {
+            $ta->update([
+                'judul' => $request->judul,
+                'kode_dosen1' => $request->kode_dosen1,
+                'kode_dosen2' => $request->kode_dosen2,
+                'tanggal_lulus_ta' => $request->tanggal_lulus_ta,
+            ]);
+        } else {
+            TugasAkhir::create([
+                'nrp' => $user->id,
+                'judul' => $request->judul,
+                'kode_dosen1' => $request->kode_dosen1,
+                'kode_dosen2' => $request->kode_dosen2,
+                'tanggal_lulus_ta' => $request->tanggal_lulus_ta,
+            ]);
+        }
+
 
         return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui.');
     }

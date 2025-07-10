@@ -7,7 +7,6 @@
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
-    <a href="{{ route('admin.pendidikan.create', $mahasiswa->nrp) }}" class="btn btn-success mb-3">Tambah Pendidikan</a>
 
     @if($pendidikans->isEmpty())
         <p>Tidak ada data pendidikan.</p>
@@ -15,7 +14,7 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Jurusan</th>
+                    <th>Program Studi</th>
                     <th>Angkatan</th>
                     <th>Tanggal Lulus</th>
                     <th>Jumlah Semester</th>

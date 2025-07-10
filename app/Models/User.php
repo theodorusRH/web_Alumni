@@ -38,6 +38,11 @@ class User extends Authenticatable
         return $this->hasOne(Mahasiswa::class, 'nrp', 'id'); // user.id → mahasiswa.nrp
     }
 
+    public function tugasAkhir()
+    {
+        return $this->hasOne(TugasAkhir::class, 'nrp', 'id'); // user.id → mahasiswa.nrp
+    }
+
     public function pendidikan()
     {
         return $this->hasMany(\App\Models\Pendidikan::class, 'nrp', 'id');

@@ -53,13 +53,11 @@
                         style="width: 200px; height: 200px; object-fit: cover; object-position: center; cursor: pointer;"
                         alt="Foto Lama"
                         data-bs-toggle="modal" data-bs-target="#fotoModal">
-                    <small class="text-muted d-block text-center">Foto Lama</small>
+                    {{-- <small class="text-muted d-block text-center">Foto Lama</small> --}}
                 @else
-                    <img id="fotoPreviewLama" 
-                        class="img-thumbnail mb-2 mx-auto d-block" 
-                        style="width: 200px; height: 200px; object-fit: cover; object-position: center;"
-                        alt="Foto Lama">
-                    <small class="text-muted d-block text-center">Belum ada foto</small>
+                    <div class="mb-2 border bg-light mx-auto" style="width:150px; height:150px; display:flex; align-items:center; justify-content:center;">
+                        <i class="bi bi-person-circle" style="font-size: 4rem; color: #ccc;"></i>
+                    </div>
                 @endif
 
                 {{-- Preview foto baru --}}
@@ -100,11 +98,20 @@
 
             {{-- Input ID, Username, Password --}}
             <div class="col-md-8">
+                @if ($user->roles->name === 'alumni')
                 <div class="mb-3">
-                    <label>ID</label>
+                    <label>NRP</label>
                     <input type="text" name="id" class="form-control"
                         value="{{ $user->id }}" {{ $user->roles->name === 'alumni' ? 'readonly' : '' }}>
                 </div>
+                @elseif($user->roles->name === 'dosen' || $user->roles->name === 'admin')
+                <div class="mb-3">
+                    <label>NPK</label>
+                    <input type="text" name="id" class="form-control"
+                        value="{{ $user->id }}" {{ $user->roles->name === 'alumni' ? 'readonly' : '' }}>
+                </div>
+                @endif
+
 
                 <div class="mb-3">
                     <label>Username</label>
@@ -250,7 +257,7 @@
                         @endif
 
                         @foreach ($dosenList as $dosen)
-                            <option value="{{ $dosen->nip }}">
+                            <option value="{{ $dosen->kode }}">
                                 {{ $dosen->nama }}
                             </option>
                         @endforeach
@@ -267,7 +274,7 @@
                         @endif
 
                         @foreach ($dosenList as $dosen)
-                            <option value="{{ $dosen->nip }}">
+                            <option value="{{ $dosen->kode }}">
                                 {{ $dosen->nama }}
                             </option>
                         @endforeach

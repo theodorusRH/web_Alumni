@@ -70,20 +70,20 @@
         @auth
             @if(Auth::user()->isAdmin())
                 <a class="navbar-brand d-flex align-items-center" href="{{ route('dashboard.index') }}">
-                    <img src="{{ asset('images/kontak/LOGO_IKA_UBAYA.png') }}" alt="Logo UBAYA">
+                    <img src="{{ asset('images/kontak/ifubaya.png') }}" alt="Logo UBAYA">
                 </a>
             @elseif(Auth::user()->isUser())
                 <a class="navbar-brand d-flex align-items-center" href="{{ route('dashboard.user') }}">
-                    <img src="{{ asset('images/kontak/LOGO_IKA_UBAYA.png') }}" alt="Logo UBAYA">
+                    <img src="{{ asset('images/kontak/ifubaya.png') }}" alt="Logo UBAYA">
                 </a>
             @else
                 <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-                    <img src="{{ asset('images/kontak/LOGO_IKA_UBAYA.png') }}" alt="Logo UBAYA">
+                    <img src="{{ asset('images/kontak/ifubaya.png') }}" alt="Logo UBAYA">
                 </a>
             @endif
         @else
             <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-                <img src="{{ asset('images/kontak/LOGO_IKA_UBAYA.png') }}" alt="Logo UBAYA">
+                <img src="{{ asset('images/kontak/ifubaya.png') }}" alt="Logo UBAYA">
             </a>
         @endauth
 
@@ -166,7 +166,7 @@
                         <a class="btn px-3 {{ Request::is('register') ? 'btn-success btn-outline-success' : 'btn-outline-primary' }}" href="{{ route('register.form') }}" role="button">Sign Up</a>
                     </li>
                 @else
-                    <li class="nav-item dropdown mx-2">
+                    {{-- <li class="nav-item dropdown mx-2">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             Welcome, {{ Auth::user()->username }}
@@ -175,6 +175,52 @@
                             <li>
                                 <a class="dropdown-item" href="{{ route('profile') }}">Profile</a>
                             </li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" class="dropdown-item p-0 m-0">
+                                    @csrf
+                                    <button type="submit" class="btn btn-link dropdown-item w-100 text-start">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li> --}}
+
+                    {{-- Notifikasi --}}
+                    @if(Auth::user()->roles->name === 'admin')
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="notifDropdown" data-bs-toggle="dropdown">
+                                @if(Auth::check() && Auth::user()->roles->name === 'admin')
+                                    <i class="bi bi-bell"></i>
+                                    @if($totalNotifikasi > 0)
+                                        <span class="badge bg-danger">{{ $totalNotifikasi }}</span>
+                                    @endif
+                                @endif
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="NotifDropdown">
+                                @if($lowonganNotifikasi > 0)
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{{ route('admin.lowongan.index') }}">
+                                            🔔 {{ $lowonganNotifikasi }} lowongan belum diaktifkan
+                                        </a>
+                                    </li>
+                                @endif
+                                @if($userPendingNotifikasi > 0)
+                                    <li>
+                                        <a class="dropdown-item text-warning" href="{{ route('admin.mahasiswa.index') }}">
+                                            👤 {{ $userPendingNotifikasi }} alumni perlu verifikasi
+                                        </a>
+                                    </li>
+                                @endif
+                            </ul>
+                        </li>
+                    @endif
+
+                    {{-- User Dropdown --}}
+                    <li class="nav-item dropdown mx-2">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                            Welcome, {{ Auth::user()->username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{{ route('profile') }}">Profile</a></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" class="dropdown-item p-0 m-0">
                                     @csrf

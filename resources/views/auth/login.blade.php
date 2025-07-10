@@ -19,7 +19,7 @@
             @csrf
 
             <div class="mb-3">
-                <label for="id" class="form-label">ID</label>
+                <label for="id" class="form-label">Email / Nrp</label>
                 <input id="id" type="text" name="id" class="form-control" required autofocus>
             </div>
 
