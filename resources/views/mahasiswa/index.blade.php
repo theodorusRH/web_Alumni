@@ -55,6 +55,12 @@
                 <th>Pendidikan</th>
                 <th>Pekerjaan</th>
                 <th>Detail</th>
+                @if(Auth::user()->roles->name === 'admin')
+                    <th>Reset Password</th>
+                @endif
+                @if(Auth::user()->roles->name === 'admin')
+                    <th>Update Password</th>
+                @endif
             </tr>
         </thead>
         <tbody>
@@ -115,6 +121,34 @@
                             Lihat Detail
                         </a>
                     </td>
+
+                    @if(Auth::user()->roles->name === 'admin')
+                        <td>
+                            <form action="{{ route('admin.mahasiswa.resetPassword', $mhs->nrp) }}" method="POST" onsubmit="return confirm('Reset password mahasiswa ini ke default?')">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit"
+                                    style="padding: 4px 8px; border: none; border-radius: 3px; cursor: pointer;
+                                        background-color: #ffc107; color: black;">
+                                    Reset
+                                </button>
+                            </form>
+                        </td>
+                    @endif
+                    @if(Auth::user()->roles->name === 'admin')
+                        <td>
+                            <form action="{{ route('admin.mahasiswa.updatePassword', $mhs->nrp) }}" method="POST" style="display: flex; gap: 5px;">
+                                @csrf
+                                @method('PATCH')
+                                <input type="password" name="new_password" placeholder="Password baru" required style="width: 120px;">
+                                <button type="submit"
+                                    style="padding: 2px 6px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                                    Simpan
+                                </button>
+                            </form>
+                        </td>
+                    @endif
+
                 </tr>
             @empty
                 <tr>

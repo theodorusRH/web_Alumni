@@ -104,6 +104,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/mahasiswa/{nrp}', [MahasiswaController::class, 'updateMahasiswa'])->name('mahasiswa.update');
     Route::delete('/mahasiswa/{nrp}', [MahasiswaController::class, 'destroyMahasiswa'])->name('mahasiswa.destroy');
     Route::patch('/mahasiswa/{nrp}/toggle-status', [MahasiswaController::class, 'toggleStatus'])->name('mahasiswa.toggleStatus');
+    Route::patch('/mahasiswa/{nrp}/reset-password', [MahasiswaController::class, 'resetPassword'])->name('mahasiswa.resetPassword');
+    Route::patch('/mahasiswa/{nrp}/update-password', [MahasiswaController::class, 'updatePasswordManual'])->name('mahasiswa.updatePassword');
 
     Route::get('/alumni', [AlumniController::class, 'alumni'])->name('alumni');
     Route::get('/pendidikan/{nrp}', [PendidikanController::class, 'index'])->name('pendidikan.show');

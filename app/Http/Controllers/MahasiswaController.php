@@ -149,4 +149,38 @@ class MahasiswaController extends Controller
 
         return redirect()->back()->with('success', 'Status Mahasiswa dan User berhasil diperbarui.');
     }
+
+    public function resetPassword($nrp)
+    {
+        $user = User::find($nrp);
+
+        if (!$user) {
+            return redirect()->back()->withErrors(['msg' => 'User tidak ditemukan.']);
+        }
+
+        $defaultPassword = '123456789'; // default password baru
+        $user->password = bcrypt($defaultPassword);
+        $user->save();
+
+        return redirect()->back()->with('success', 'Password mahasiswa berhasil direset ke default.');
+    }
+
+    public function updatePasswordManual(Request $request, $nrp)
+    {
+        $request->validate([
+            'new_password' => 'required|string|min:5',
+        ]);
+
+        $user = User::find($nrp);
+
+        if (!$user) {
+            return redirect()->back()->withErrors(['msg' => 'User tidak ditemukan.']);
+        }
+
+        $user->password = bcrypt($request->new_password);
+        $user->save();
+
+        return redirect()->back()->with('success', 'Password berhasil diperbarui.');
+    }
+
 }
